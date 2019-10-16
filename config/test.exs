@@ -6,7 +6,8 @@ config :event_manager,
        username: "event_manager",
        password: "event_manager",
        database: "event_manager_test",
-       hostname: "localhost",
+       hostname: System.get_env("POSTGRES_HOST") || "localhost",
+       port: String.to_integer(System.get_env("POSTGRES_PORT") || "5432"),
        pool: Ecto.Adapters.SQL.Sandbox
 
 # We don't run a server during test. If one is required,
