@@ -26,9 +26,9 @@ config :event_manager,
        :openid_connect_providers,
        keycloak: [
          discovery_document_uri:
-           "http://localhost:8080/auth/realms/event-manager/.well-known/openid-configuration",
-         client_id: "em-backend",
-         client_secret: "secret",
+           "https://samples.auth0.com/.well-known/openid-configuration",
+         client_id: "test",
+         client_secret: "test",
          redirect_uri: "http://localhost:4000",
          response_type: "code",
          scope: "openid email profile"
