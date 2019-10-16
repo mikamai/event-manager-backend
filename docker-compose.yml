@@ -1,0 +1,29 @@
+version: '3.1'
+
+services:
+  db:
+    image: postgres:11-alpine
+    ports:
+    - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: event_manager
+      POSTGRES_USER: event_manager
+      POSTGRES_DB: event_manager_dev
+    volumes:
+      - "event_manager_db:/var/lib/postgresql/data"
+  keycloak:
+    image: jboss/keycloak:7.0.0
+    restart: 'no'
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      KEYCLOAK_IMPORT: /tmp/realm-export.json
+      ROOT_LOGLEVEL: INFO
+    volumes:
+      - "keycloak_db:/opt/jboss/keycloak/standalone/data"
+      - "$PWD/realm-export.json:/tmp/realm-export.json"
+    ports:
+      - "8080:8080"
+volumes:
+  event_manager_db:
+  keycloak_db:
