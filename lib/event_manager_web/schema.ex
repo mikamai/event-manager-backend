@@ -4,10 +4,6 @@ defmodule EventManagerWeb.Schema do
   import_types(EventManagerWeb.Schema.CurrentUser)
 
   query do
-    field :ping, :string do
-      resolve(fn _, _ -> {:ok, "pong"} end)
-    end
-
     field :current_user, :current_user do
       resolve(&EventManagerWeb.Resolvers.Users.current_user/2)
     end

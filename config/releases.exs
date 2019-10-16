@@ -23,20 +23,23 @@ config :event_manager, EventManagerWeb.Endpoint,
   secret_key_base: secret_key_base,
   server: true
 
-discovery_document_uri = System.get_env("OIDC_DISCOVERY_URL") ||
-  raise """
-  """
+discovery_document_uri =
+  System.get_env("OIDC_DISCOVERY_URL") ||
+    raise """
+    """
 
-client_secret = System.get_env("OIDC_CLIENT_SECRET") ||
-  raise """
-  """
+client_secret =
+  System.get_env("OIDC_CLIENT_SECRET") ||
+    raise """
+    """
 
 config :event_manager, :openid_connect_providers,
   keycloak: [
     discovery_document_uri: discovery_document_uri,
     client_id: System.get_env("OIDC_CLIENT_ID") || "em-backend",
     client_secret: client_secret,
-    redirect_uri: "http://localhost:4000", # we don't care since we're an API
+    # we don't care since we're an API
+    redirect_uri: "http://localhost:4000",
     response_type: "code",
     scope: "openid email profile"
   ]

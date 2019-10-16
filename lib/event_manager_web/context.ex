@@ -27,16 +27,19 @@ defmodule EventManagerWeb.Context do
       {:error, reason} ->
         Logger.error("Token verification failed: #{reason}")
         %{}
-      _ -> %{}
+
+      _ ->
+        %{}
     end
   end
 
   defp authorize(token) do
     case OpenIDConnect.verify(:keycloak, token) do
       {:ok, claims} ->
-        if DateTime.compare(DateTime.utc_now(), DateTime.from_unix!(claims["exp"])) == :gt, 
+        if DateTime.compare(DateTime.utc_now(), DateTime.from_unix!(claims["exp"])) == :gt,
           do: {:error, "token expired"},
           else: {:ok, EventManagerWeb.Schema.CurrentUser.from_claims(claims)}
+
       {:error, :verify, reason} ->
         {:error, reason}
     end
