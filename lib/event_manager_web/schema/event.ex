@@ -3,6 +3,14 @@ defmodule EventManagerWeb.Schema.Event do
 
   import_types(EventManagerWeb.Types.Event)
 
+  object :event_queries do
+    @desc "Get a new event"
+    field :event, :event do
+      arg(:id, non_null(:id))
+      resolve(&EventManagerWeb.Resolvers.Event.get_event/2)
+    end
+  end
+
   object :event_mutations do
     @desc "Create a new event"
     field :event_create, :event do

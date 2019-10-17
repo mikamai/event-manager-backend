@@ -8,6 +8,8 @@ defmodule EventManagerWeb.Schema do
     field :current_user, :current_user do
       resolve(&EventManagerWeb.Resolvers.Users.current_user/2)
     end
+
+    import_fields(:event_queries)
   end
 
   mutation do
