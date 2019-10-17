@@ -21,4 +21,26 @@ defmodule EventManagerWeb.Resolvers.Event do
         {:error, changeset}
     end
   end
+
+  @spec delete_event(
+          %{event: :invalid | %{optional(:__struct__) => none, optional(atom | binary) => any}},
+          any
+        ) :: {:error, any} | {:ok, any}
+  def delete_event(%{id: id}, _info) do
+    EventManager.Repo.get(Event, id) |> do_delete()
+  end
+
+  defp do_delete(nil), do: {:error, "event.not_found"}
+
+  defp do_delete(%Event{status: :draft} = event) do
+    case EventManager.Repo.delete(event) do
+      {:ok, struct} ->
+        {:ok, struct}
+
+      {:error, _changeset} ->
+        {:error, "event.generic_error"}
+    end
+  end
+
+  defp do_delete(_), do: {:error, "event.invalid_status"}
 end

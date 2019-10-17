@@ -19,7 +19,7 @@ defmodule EventManagerWeb.Schema.EventTest do
     # Setting the shared mode must be done only after checkout
   end
 
-  describe "mutation createEvent" do
+  describe "mutation eventCreate" do
     @mutation """
     mutation EventCreate($event: EventCreateInput!) {
       eventCreate(event: $event) { #{@event_data} }
@@ -121,6 +121,92 @@ defmodule EventManagerWeb.Schema.EventTest do
                  %{
                    message: "event.not_found",
                    path: ["event"]
+                 }
+               ]
+             } = result
+    end
+  end
+
+  describe "mutation deleteEvent" do
+    @mutation """
+    mutation EventDelete($id: ID!) {
+      eventDelete(id: $id) { #{@event_data} }
+    }
+    """
+
+    test "respond to the delete event mutation" do
+      event = %Event{
+        description: "Test",
+        title: "test",
+        location: "here",
+        public: true,
+        status: 0,
+        start_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        end_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+      }
+
+      event = EventManager.Repo.insert!(event)
+
+      {:ok, result} = Absinthe.run(@mutation, @schema, variables: %{"id" => event.id})
+
+      assert %{
+               data: %{
+                 "eventDelete" => %{
+                   "description" => description,
+                   "endTime" => end_time,
+                   "location" => location,
+                   "public" => public,
+                   "startTime" => start_time,
+                   "status" => "DRAFT",
+                   "title" => title
+                 }
+               }
+             } = result
+
+      assert title == event.title
+      assert description == event.description
+      assert location == event.location
+      assert public == event.public
+      assert end_time == event.end_time |> NaiveDateTime.to_iso8601()
+      assert start_time == event.start_time |> NaiveDateTime.to_iso8601()
+    end
+
+    test "responds invalid status when the event is not in draft status" do
+      event = %Event{
+        description: "Test",
+        title: "test",
+        location: "here",
+        public: true,
+        status: 1,
+        start_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+        end_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+      }
+
+      event = EventManager.Repo.insert!(event)
+
+      {:ok, result} = Absinthe.run(@mutation, @schema, variables: %{"id" => event.id})
+
+      assert %{
+               data: %{"eventDelete" => nil},
+               errors: [
+                 %{
+                   message: "event.invalid_status",
+                   path: ["eventDelete"]
+                 }
+               ]
+             } = result
+    end
+
+    test "responds not found for an unexisting event" do
+      uuid = "550e8400-e29b-41d4-a716-446655440000"
+      {:ok, result} = Absinthe.run(@mutation, @schema, variables: %{"id" => uuid})
+
+      assert %{
+               data: %{"eventDelete" => nil},
+               errors: [
+                 %{
+                   message: "event.not_found",
+                   path: ["eventDelete"]
                  }
                ]
              } = result
