@@ -18,5 +18,12 @@ defmodule EventManagerWeb.Schema.Event do
 
       resolve(&EventManagerWeb.Resolvers.Event.create_event/2)
     end
+
+    @desc "Delete an event"
+    field :event_delete, :event do
+      arg(:id, non_null(:id))
+
+      resolve(&EventManagerWeb.Resolvers.Event.delete_event/2)
+    end
   end
 end
