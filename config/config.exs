@@ -11,6 +11,8 @@ config :event_manager,
   ecto_repos: [EventManager.Repo],
   generators: [binary_id: true]
 
+config :event_manager, EventManager.Repo, migration_primary_key: [name: :uuid, type: :binary_id]
+
 # Configures the endpoint
 config :event_manager, EventManagerWeb.Endpoint,
   url: [host: "localhost"],
