@@ -34,6 +34,7 @@ defmodule EventManager.MixProject do
   defp deps do
     [
       {:absinthe_phoenix, "~> 1.4"},
+      {:absinthe_relay, "~> 1.4"},
       {:phoenix, "~> 1.4.10"},
       {:phoenix_pubsub, "~> 1.1"},
       {:phoenix_ecto, "~> 4.0"},

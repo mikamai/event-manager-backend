@@ -212,4 +212,78 @@ defmodule EventManagerWeb.Schema.EventTest do
              } = result
     end
   end
+
+  describe "query events" do
+    setup do
+      [
+        %Event{
+          description: "Test1",
+          title: "test1",
+          location: "here",
+          public: true,
+          status: 0,
+          start_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+          end_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+        },
+        %Event{
+          description: "Test2",
+          title: "test2",
+          location: "here",
+          public: true,
+          status: 0,
+          start_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
+          end_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+        }
+      ]
+      |> Enum.map(&Event.changeset/1)
+      |> Enum.map(&EventManager.Repo.insert/1)
+    end
+
+    @query """
+    query Events($first: Int, $after: String) {
+      events(first: $first, after: $after) {
+        edges { node { #{@event_data} } }
+        pageInfo {
+          hasPreviousPage
+          hasNextPage
+          startCursor
+          endCursor
+        }
+      }
+    }
+    """
+
+    test "responds to the events query when using first" do
+      {:ok, result} = Absinthe.run(@query, @schema, variables: %{"first" => 1})
+
+      assert %{
+               data: %{
+                 "events" => %{
+                   "edges" => [
+                     %{
+                       "node" => %{
+                         "title" => "test1"
+                       }
+                     }
+                   ],
+                   "pageInfo" => %{
+                     "hasNextPage" => false,
+                     "hasPreviousPage" => false,
+                     "endCursor" => endCursor
+                   }
+                 }
+               }
+             } = result
+    end
+
+    test "responds to the events query when using first and after" do
+      {:ok, result} = Absinthe.run(@query, @schema, variables: %{"first" => 1})
+      %{data: %{"events" => %{"pageInfo" => %{"endCursor" => endCursor}}}} = result
+
+      {:ok, result} =
+        Absinthe.run(@query, @schema, variables: %{"first" => 1, "after" => endCursor})
+
+      %{data: %{"events" => %{"edges" => [%{"node" => %{"title" => "test2"}}]}}} = result
+    end
+  end
 end
