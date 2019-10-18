@@ -1,8 +1,8 @@
 defmodule EventManagerWeb.Schema do
   use Absinthe.Schema
 
-  import_types(EventManagerWeb.Schema.CurrentUser)
-  import_types(EventManagerWeb.Schema.Event)
+  import_types(EventManagerWeb.Types.CurrentUser)
+  import_types(EventManagerWeb.Schema.Events)
 
   query do
     field :current_user, :current_user do

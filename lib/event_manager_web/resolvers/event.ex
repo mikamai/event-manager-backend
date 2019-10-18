@@ -40,7 +40,9 @@ defmodule EventManagerWeb.Resolvers.Event do
   end
 
   def create_event(%{event: event}, %{context: %{current_user: current_user}}) do
-    case Map.put(event, :status, :draft) |> Events.create_event() do
+    case Map.put(event, :status, :draft)
+         |> Map.put(:creator_id, current_user.id)
+         |> Events.create_event() do
       {:ok, struct} ->
         PubSub.broadcast(EventManager.PubSub, "user:created", {:user_created, struct})
         {:ok, struct}

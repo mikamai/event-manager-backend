@@ -2,7 +2,7 @@ defmodule EventManager.Users.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @primary_key {:id, :binary_id, autogenerate: true}
+  @primary_key {:id, :binary_id, autogenerate: false}
   @foreign_key_type :binary_id
 
   schema "users" do
@@ -19,7 +19,7 @@ defmodule EventManager.Users.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :name, :username, :first_name, :last_name])
-    |> validate_required([:email, :name, :username, :first_name, :last_name])
+    |> cast(attrs, [:id, :email, :name, :username, :first_name, :last_name])
+    |> validate_required([:id, :email, :name, :username, :first_name, :last_name])
   end
 end

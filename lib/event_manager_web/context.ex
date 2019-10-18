@@ -2,11 +2,10 @@ defmodule EventManagerWeb.Context do
   @behaviour Plug
 
   import Plug.Conn
-  import Ecto.Query, only: [where: 2]
 
   require Logger
 
-  alias EventManager.{Repo, User}
+  alias EventManager.Users
 
   def init(opts), do: opts
 
@@ -21,11 +20,10 @@ defmodule EventManagerWeb.Context do
   def build_context(conn) do
     with ["Bearer " <> token] <- get_req_header(conn, "authorization"),
          {:ok, current_user} <- authorize(token) do
-      # Logger.info(inspect(current_user))
       %{current_user: current_user}
     else
       {:error, reason} ->
-        Logger.error("Token verification failed: #{reason}")
+        Logger.error("Token verification failed: #{inspect(reason)}")
         %{current_user: nil}
 
       _ ->
@@ -36,9 +34,22 @@ defmodule EventManagerWeb.Context do
   defp authorize(token) do
     case OpenIDConnect.verify(:keycloak, token) do
       {:ok, claims} ->
-        if DateTime.compare(DateTime.utc_now(), DateTime.from_unix!(claims["exp"])) == :gt,
-          do: {:error, "token expired"},
-          else: {:ok, EventManagerWeb.Schema.CurrentUser.from_claims(claims)}
+        if DateTime.compare(DateTime.utc_now(), DateTime.from_unix!(claims["exp"])) == :gt do
+          {:error, "token expired"}
+        else
+          params = Users.from_claims(claims)
+          IO.inspect(params)
+          result = if user = Users.get_user(params.id) do
+            Users.update_user(user, params)
+          else
+            Users.create_user(params)
+          end
+
+          case result do
+            {:ok, user} -> {:ok, user}
+             {:error, changeset} -> {:error, changeset.errors}
+          end
+        end
 
       {:error, :verify, reason} ->
         {:error, reason}

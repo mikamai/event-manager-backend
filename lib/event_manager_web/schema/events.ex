@@ -1,4 +1,4 @@
-defmodule EventManagerWeb.Schema.Event do
+defmodule EventManagerWeb.Schema.Events do
   use Absinthe.Schema.Notation
   use Absinthe.Relay.Schema, :modern
 

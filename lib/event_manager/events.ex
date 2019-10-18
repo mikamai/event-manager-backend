@@ -55,15 +55,15 @@ defmodule EventManager.Events do
   @doc """
   Gets a single event.
 
-  Raises `Ecto.NoResultsError` if the Event does not exist.
+  Returns `nil` if the Event does not exist.
 
   ## Examples
 
-      iex> get_event!(123)
+      iex> get_event(123)
       %Event{}
 
-      iex> get_event!(456)
-      ** (Ecto.NoResultsError)
+      iex> get_event(456)
+      nil
 
   """
   def get_event(id), do: Repo.get(Event, id)
@@ -131,5 +131,10 @@ defmodule EventManager.Events do
   """
   def change_event(%Event{} = event) do
     Event.changeset(event, %{})
+  end
+
+  def get_event_creator(%Event{} = event) do
+    Ecto.assoc(event, :creator)
+    |> Repo.one!()
   end
 end
