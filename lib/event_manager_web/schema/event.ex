@@ -1,5 +1,6 @@
 defmodule EventManagerWeb.Schema.Event do
   use Absinthe.Schema.Notation
+  use Absinthe.Relay.Schema, :modern
 
   import_types(EventManagerWeb.Types.Event)
 
@@ -8,6 +9,10 @@ defmodule EventManagerWeb.Schema.Event do
     field :event, :event do
       arg(:id, non_null(:id))
       resolve(&EventManagerWeb.Resolvers.Event.get_event/2)
+    end
+
+    connection field(:events, node_type: :event) do
+      resolve(&EventManagerWeb.Resolvers.Event.events/2)
     end
   end
 

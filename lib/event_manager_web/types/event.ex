@@ -1,5 +1,7 @@
 defmodule EventManagerWeb.Types.Event do
   use Absinthe.Schema.Notation
+  use Absinthe.Relay.Schema, :modern
+
   import_types(Absinthe.Type.Custom)
 
   input_object :event_create_input do
@@ -31,4 +33,6 @@ defmodule EventManagerWeb.Types.Event do
     field(:inserted_at, non_null(:naive_datetime))
     field(:updated_at, non_null(:naive_datetime))
   end
+
+  connection(node_type: :event)
 end

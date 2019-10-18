@@ -1,4 +1,17 @@
 defmodule EventManagerWeb.Resolvers.Event do
+  import Ecto.Query
+
+  def events(pagination_args, _info) do
+    {:ok, :forward, limit} = Absinthe.Relay.Connection.limit(pagination_args)
+    {:ok, offset} = Absinthe.Relay.Connection.offset(pagination_args)
+
+    Event
+    |> limit(^limit)
+    |> offset(^offset)
+    |> EventManager.Repo.all()
+    |> Absinthe.Relay.Connection.from_slice(offset)
+  end
+
   def get_event(%{id: id}, _info) do
     case EventManager.Repo.get(Event, id) do
       nil -> {:error, "event.not_found"}
