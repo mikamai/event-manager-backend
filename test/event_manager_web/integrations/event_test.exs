@@ -1,5 +1,7 @@
 defmodule EventManagerWeb.Schema.EventTest do
   use ExUnit.Case
+  alias EventManager.Events.Event
+
   @schema EventManagerWeb.Schema
 
   @event_data """
@@ -79,7 +81,7 @@ defmodule EventManagerWeb.Schema.EventTest do
     """
 
     test "responds to the event query" do
-      event = %EventManager.Events.Event{
+      event = %Event{
         description: "Test",
         title: "test",
         location: "here",
@@ -124,11 +126,12 @@ defmodule EventManagerWeb.Schema.EventTest do
                data: %{"event" => nil},
                errors: [
                  %{
-                   message: message,
+                   message: error,
                    path: ["event"]
                  }
                ]
              } = result
+      assert error == message
     end
   end
 
@@ -140,7 +143,7 @@ defmodule EventManagerWeb.Schema.EventTest do
     """
 
     test "respond to the delete event mutation" do
-      event = %EventManager.Events.Event{
+      event = %Event{
         description: "Test",
         title: "test",
         location: "here",
@@ -178,7 +181,7 @@ defmodule EventManagerWeb.Schema.EventTest do
     end
 
     test "responds invalid status when the event is not in draft status" do
-      event = %EventManager.Events.Event{
+      event = %Event{
         description: "Test",
         title: "test",
         location: "here",
@@ -212,11 +215,12 @@ defmodule EventManagerWeb.Schema.EventTest do
                data: %{"eventDelete" => nil},
                errors: [
                  %{
-                   message: message,
+                   message: error,
                    path: ["eventDelete"]
                  }
                ]
              } = result
+      assert error == message
     end
   end
 
