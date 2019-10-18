@@ -19,6 +19,8 @@ defmodule EventManagerWeb.Schema.EventTest do
     # Setting the shared mode must be done only after checkout
   end
 
+  def current_user(context \\ %{}), do: Map.put(context, :current_user, %{id: Ecto.UUID.generate()})
+
   describe "mutation eventCreate" do
     @mutation """
     mutation EventCreate($event: EventCreateInput!) {
@@ -26,7 +28,7 @@ defmodule EventManagerWeb.Schema.EventTest do
     }
     """
 
-    test "responds to a createEvent mutation" do
+    test "responds to a eventCreate mutation" do
       event = %{
         "description" => "Test",
         "title" => "test",
@@ -42,7 +44,7 @@ defmodule EventManagerWeb.Schema.EventTest do
           |> NaiveDateTime.to_iso8601()
       }
 
-      {:ok, result} = Absinthe.run(@mutation, @schema, variables: %{"event" => event})
+      {:ok, result} = Absinthe.run(@mutation, @schema, variables: %{"event" => event}, context: current_user())
 
       assert %{
                data: %{
@@ -75,7 +77,7 @@ defmodule EventManagerWeb.Schema.EventTest do
     """
 
     test "responds to the event query" do
-      event = %Event{
+      event = %EventManager.Events.Event{
         description: "Test",
         title: "test",
         location: "here",
@@ -111,15 +113,15 @@ defmodule EventManagerWeb.Schema.EventTest do
       assert start_time == event.start_time |> NaiveDateTime.to_iso8601()
     end
 
-    test "responds not found for an unexisting event" do
+    test "responds not found for an nonexistent event" do
       uuid = "550e8400-e29b-41d4-a716-446655440000"
       {:ok, result} = Absinthe.run(@query, @schema, variables: %{"id" => uuid})
-
+      message = "Event not found by id #{uuid}"
       assert %{
                data: %{"event" => nil},
                errors: [
                  %{
-                   message: "event.not_found",
+                   message: message,
                    path: ["event"]
                  }
                ]
@@ -135,7 +137,7 @@ defmodule EventManagerWeb.Schema.EventTest do
     """
 
     test "respond to the delete event mutation" do
-      event = %Event{
+      event = %EventManager.Events.Event{
         description: "Test",
         title: "test",
         location: "here",
@@ -147,7 +149,7 @@ defmodule EventManagerWeb.Schema.EventTest do
 
       event = EventManager.Repo.insert!(event)
 
-      {:ok, result} = Absinthe.run(@mutation, @schema, variables: %{"id" => event.id})
+      {:ok, result} = Absinthe.run(@mutation, @schema, variables: %{"id" => event.id}, context: current_user())
 
       assert %{
                data: %{
@@ -172,12 +174,12 @@ defmodule EventManagerWeb.Schema.EventTest do
     end
 
     test "responds invalid status when the event is not in draft status" do
-      event = %Event{
+      event = %EventManager.Events.Event{
         description: "Test",
         title: "test",
         location: "here",
         public: true,
-        status: 1,
+        status: :published,
         start_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
         end_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       }
@@ -190,22 +192,22 @@ defmodule EventManagerWeb.Schema.EventTest do
                data: %{"eventDelete" => nil},
                errors: [
                  %{
-                   message: "event.invalid_status",
+                   message: "Only drafted events can be deleted. Current status: published",
                    path: ["eventDelete"]
                  }
                ]
              } = result
     end
 
-    test "responds not found for an unexisting event" do
+    test "responds not found for an nonexistent event" do
       uuid = "550e8400-e29b-41d4-a716-446655440000"
       {:ok, result} = Absinthe.run(@mutation, @schema, variables: %{"id" => uuid})
-
+      message = "Event not found by id #{uuid}"
       assert %{
                data: %{"eventDelete" => nil},
                errors: [
                  %{
-                   message: "event.not_found",
+                   message: message,
                    path: ["eventDelete"]
                  }
                ]

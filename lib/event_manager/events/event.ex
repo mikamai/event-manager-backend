@@ -1,4 +1,4 @@
-defmodule Event do
+defmodule EventManager.Events.Event do
   use Ecto.Schema
   import Ecto.Changeset
   import EctoEnum
@@ -6,7 +6,7 @@ defmodule Event do
   defenum(StatusEnum, draft: 0, published: 1, ended: 2, cancelled: 3)
 
   @primary_key {:id, :binary_id, autogenerate: true}
-  # weather is the DB table
+  @foreign_key_type :binary_id
 
   schema "events" do
     field :title, :string

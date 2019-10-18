@@ -1,8 +1,18 @@
 defmodule EventManagerWeb.Resolvers.Event do
-  def get_event(%{id: id}, _info) do
-    case EventManager.Repo.get(Event, id) do
-      nil -> {:error, "event.not_found"}
-      event -> {:ok, event}
+  alias Phoenix.PubSub
+  alias EventManager.Events
+  import EventManagerWeb.Gettext
+
+  def get_event(%{id: ""}, _info) do
+    {:error, "event.not_found"}
+  end
+
+  def get_event(%{id: id}, _info) when is_binary(id) do
+    with {:ok, uuid} <- Ecto.UUID.cast(id),
+      event when not is_nil(event) <- Events.get_event(uuid) do
+      {:ok, event}
+    else
+      _ -> {:error, dgettext("errors", "Event not found by id %{id}", id: id)}
     end
   end
 
@@ -10,15 +20,17 @@ defmodule EventManagerWeb.Resolvers.Event do
           %{event: :invalid | %{optional(:__struct__) => none, optional(atom | binary) => any}},
           any
         ) :: {:error, any} | {:ok, any}
-  def create_event(%{event: event}, _info) do
-    case %Event{status: :draft}
-         |> Event.changeset(event)
-         |> EventManager.Repo.insert() do
-      {:ok, struct} ->
-        {:ok, struct}
+  def create_event(args, %{context: %{current_user: nil}}) do
+    {:error, dgettext("errors", "Unauthorized")}
+  end
 
+  def create_event(%{event: event}, _info) do
+    case Map.put(event, :status, :draft) |> Events.create_event() do
+      {:ok, struct} ->
+        PubSub.broadcast(EventManager.PubSub, "user:created", {:user_created, struct})
+        {:ok, struct}
       {:error, changeset} ->
-        {:error, changeset}
+        {:error, changeset.errors}
     end
   end
 
@@ -26,21 +38,21 @@ defmodule EventManagerWeb.Resolvers.Event do
           %{event: :invalid | %{optional(:__struct__) => none, optional(atom | binary) => any}},
           any
         ) :: {:error, any} | {:ok, any}
-  def delete_event(%{id: id}, _info) do
-    EventManager.Repo.get(Event, id) |> do_delete()
-  end
-
-  defp do_delete(nil), do: {:error, "event.not_found"}
-
-  defp do_delete(%Event{status: :draft} = event) do
-    case EventManager.Repo.delete(event) do
-      {:ok, struct} ->
-        {:ok, struct}
-
-      {:error, _changeset} ->
-        {:error, "event.generic_error"}
+  def delete_event(params, info) do
+    with {:ok, event} <- get_event(params, info),
+         {:ok, deleted} <- do_delete(event) do
+      {:ok, deleted}
+    else
+      {:error, errors} -> {:error, errors}
     end
   end
 
-  defp do_delete(_), do: {:error, "event.invalid_status"}
+  defp do_delete(%Events.Event{status: :draft} = event) do
+    case Events.delete_event(event) do
+      {:ok, deleted} -> {:ok, deleted}
+      {:error, changeset} -> {:error, changeset.errors}
+    end
+  end
+
+  defp do_delete(%Events.Event{status: status}), do: {:error, dgettext("errors", "Only drafted events can be deleted. Current status: %{status}", status: status)}
 end

@@ -26,10 +26,10 @@ defmodule EventManagerWeb.Context do
     else
       {:error, reason} ->
         Logger.error("Token verification failed: #{reason}")
-        %{}
+        %{current_user: nil}
 
       _ ->
-        %{}
+        %{current_user: nil}
     end
   end
 

@@ -12,11 +12,11 @@ defmodule EventManagerWeb.Types.Event do
   end
 
   enum :event_state do
-    description("Descibe the event state")
+    description("Describe the event state")
     value(:draft, description: "Event is yet to be published")
     value(:published, description: "Event is published")
     value(:ended, description: "Event has ended")
-    value(:cancelled, description: "Event has been cacelled")
+    value(:cancelled, description: "Event has been cancelled")
   end
 
   object(:event) do
@@ -28,7 +28,5 @@ defmodule EventManagerWeb.Types.Event do
     field(:status, non_null(:event_state))
     field(:start_time, non_null(:naive_datetime))
     field(:end_time, non_null(:naive_datetime))
-    field(:inserted_at, non_null(:naive_datetime))
-    field(:updated_at, non_null(:naive_datetime))
   end
 end
