@@ -25,8 +25,7 @@ config :logger, level: :warn
 config :event_manager,
        :openid_connect_providers,
        keycloak: [
-         discovery_document_uri:
-           "https://samples.auth0.com/.well-known/openid-configuration",
+         discovery_document_uri: "https://samples.auth0.com/.well-known/openid-configuration",
          client_id: "test",
          client_secret: "test",
          redirect_uri: "http://localhost:4000",

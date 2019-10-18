@@ -9,11 +9,26 @@ defmodule EventManagerWeb.Resolvers.Event do
 
   def get_event(%{id: id}, _info) when is_binary(id) do
     with {:ok, uuid} <- Ecto.UUID.cast(id),
-      event when not is_nil(event) <- Events.get_event(uuid) do
+         event when not is_nil(event) <- Events.get_event(uuid) do
       {:ok, event}
     else
       _ -> {:error, dgettext("errors", "Event not found by id %{id}", id: id)}
     end
+  end
+
+  def get_event(%{id: id}, _info) do
+    case EventManager.Repo.get(Event, id) do
+      nil -> {:error, "event.not_found"}
+      event -> {:ok, event}
+    end
+  end
+
+  def events(pagination_args, _info) do
+    {:ok, _direction, limit} = Absinthe.Relay.Connection.limit(pagination_args)
+    {:ok, offset} = Absinthe.Relay.Connection.offset(pagination_args)
+
+    Events.list_events(limit, offset)
+    |> Absinthe.Relay.Connection.from_slice(offset)
   end
 
   @spec create_event(
@@ -29,6 +44,7 @@ defmodule EventManagerWeb.Resolvers.Event do
       {:ok, struct} ->
         PubSub.broadcast(EventManager.PubSub, "user:created", {:user_created, struct})
         {:ok, struct}
+
       {:error, changeset} ->
         {:error, changeset.errors}
     end
@@ -54,5 +70,10 @@ defmodule EventManagerWeb.Resolvers.Event do
     end
   end
 
-  defp do_delete(%Events.Event{status: status}), do: {:error, dgettext("errors", "Only drafted events can be deleted. Current status: %{status}", status: status)}
+  defp do_delete(%Events.Event{status: status}),
+    do:
+      {:error,
+       dgettext("errors", "Only drafted events can be deleted. Current status: %{status}",
+         status: status
+       )}
 end

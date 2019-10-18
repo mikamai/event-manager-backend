@@ -22,6 +22,21 @@ defmodule EventManager.Events do
   end
 
   @doc """
+  Returns the paginated list of events.
+
+  ## Examples
+
+      iex> list_events(10, 1)
+      [%Event{}, ...]
+  """
+  def list_events(limit, offset) do
+    Event
+    |> limit(^limit)
+    |> offset(^offset)
+    |> Repo.all()
+  end
+
+  @doc """
   Gets a single event.
 
   Raises `Ecto.NoResultsError` if the Event does not exist.

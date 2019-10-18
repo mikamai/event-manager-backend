@@ -18,7 +18,6 @@ defmodule EventManager.PubSub.Handler do
         {:ok, state}
       end
 
-
       @impl true
       def handle_info(message, state) do
         handle(message)
@@ -26,5 +25,4 @@ defmodule EventManager.PubSub.Handler do
       end
     end
   end
-
 end
