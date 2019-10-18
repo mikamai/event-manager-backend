@@ -16,6 +16,7 @@ defmodule EventManager.Events.Event do
     field :status, StatusEnum
     field :start_time, :naive_datetime
     field :end_time, :naive_datetime
+    belongs_to :creator, EventManager.Users.User, references: :creator_id
 
     timestamps()
   end

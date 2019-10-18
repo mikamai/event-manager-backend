@@ -39,7 +39,7 @@ defmodule EventManagerWeb.Resolvers.Event do
     {:error, dgettext("errors", "Unauthorized")}
   end
 
-  def create_event(%{event: event}, _info) do
+  def create_event(%{event: event}, %{context: %{current_user: current_user}}) do
     case Map.put(event, :status, :draft) |> Events.create_event() do
       {:ok, struct} ->
         PubSub.broadcast(EventManager.PubSub, "user:created", {:user_created, struct})

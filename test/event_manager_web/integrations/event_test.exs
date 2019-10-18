@@ -131,6 +131,7 @@ defmodule EventManagerWeb.Schema.EventTest do
                  }
                ]
              } = result
+
       assert error == message
     end
   end
@@ -220,6 +221,7 @@ defmodule EventManagerWeb.Schema.EventTest do
                  }
                ]
              } = result
+
       assert error == message
     end
   end
