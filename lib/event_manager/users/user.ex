@@ -11,6 +11,7 @@ defmodule EventManager.Users.User do
     field :username, :string
     field :first_name, :string
     field :last_name, :string
+    field :locale, :string
     has_many :created_events, EventManager.Events.Event, foreign_key: :creator_id
 
     timestamps()
@@ -19,7 +20,7 @@ defmodule EventManager.Users.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:id, :email, :name, :username, :first_name, :last_name])
+    |> cast(attrs, [:id, :email, :name, :username, :first_name, :last_name, :locale])
     |> validate_required([:id, :email, :name, :username, :first_name, :last_name])
   end
 end

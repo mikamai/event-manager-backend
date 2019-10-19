@@ -10,7 +10,10 @@ defmodule EventManagerWeb.Context do
   def init(opts), do: opts
 
   def call(conn, _) do
-    context = build_context(conn)
+    context =
+      build_context(conn)
+      |> set_locale()
+
     Absinthe.Plug.put_options(conn, context: context)
   end
 
@@ -55,5 +58,12 @@ defmodule EventManagerWeb.Context do
       {:error, :verify, reason} ->
         {:error, reason}
     end
+  end
+
+  defp set_locale(%{current_user: nil} = context), do: context
+
+  defp set_locale(%{current_user: current_user} = context) do
+    Gettext.put_locale(current_user.locale)
+    context
   end
 end

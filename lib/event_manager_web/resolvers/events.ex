@@ -21,7 +21,7 @@ defmodule EventManagerWeb.Resolvers.Events do
           any
         ) :: {:error, any} | {:ok, any}
   def create_event(_args, %{context: %{current_user: nil}}) do
-    {:error, dgettext("errors", "Unauthorized")}
+    {:error, dgettext("errors", "unauthorized")}
   end
 
   def create_event(%{event: event}, %{context: %{current_user: current_user}}) do
@@ -66,7 +66,7 @@ defmodule EventManagerWeb.Resolvers.Events do
   defp do_delete(%Events.Event{status: status}),
     do:
       {:error,
-       dgettext("errors", "Only drafted events can be deleted. Current status: %{status}",
+       dgettext("errors", "only drafted events can be deleted. Current status: %{status}",
          status: status
        )}
 
@@ -80,7 +80,7 @@ defmodule EventManagerWeb.Resolvers.Events do
          event when not is_nil(event) <- get_fun.(uuid) do
       {:ok, event}
     else
-      _ -> {:error, dgettext("errors", "Event not found by id %{id}", id: id)}
+      _ -> {:error, dgettext("errors", "event not found by id %{id}", id: id)}
     end
   end
 end

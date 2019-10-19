@@ -1,5 +1,7 @@
 import Config
 
+config :gettext, :default_locale, System.get_env("DEFAULT_LOCALE", "it")
+
 database_url =
   System.get_env("DATABASE_URL") ||
     raise """

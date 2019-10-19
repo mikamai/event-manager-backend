@@ -146,7 +146,8 @@ defmodule EventManager.Users do
         "name" => name,
         "given_name" => first_name,
         "family_name" => last_name,
-        "preferred_username" => username
+        "preferred_username" => username,
+        "locale" => locale
       }),
       do: %{
         id: id,
@@ -154,6 +155,7 @@ defmodule EventManager.Users do
         name: name,
         first_name: first_name,
         last_name: last_name,
-        username: username
+        username: username,
+        locale: locale
       }
 end

@@ -7,6 +7,8 @@
 # General application configuration
 import Config
 
+config :gettext, :default_locale, "it"
+
 config :event_manager,
   ecto_repos: [EventManager.Repo],
   generators: [binary_id: true]
