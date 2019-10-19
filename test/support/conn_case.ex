@@ -20,7 +20,6 @@ defmodule EventManagerWeb.ConnCase do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
 
-      alias Ecto.Adapters.SQL.Sandbox
       alias EventManagerWeb.Router.Helpers, as: Routes
 
       # The default endpoint for testing
@@ -29,6 +28,8 @@ defmodule EventManagerWeb.ConnCase do
   end
 
   setup tags do
+    alias Ecto.Adapters.SQL.Sandbox
+
     :ok = Sandbox.checkout(EventManager.Repo)
 
     unless tags[:async] do

@@ -20,14 +20,14 @@ defmodule EventManagerWeb.ChannelCase do
       # Import conveniences for testing with channels
       use Phoenix.ChannelTest
 
-      alias Ecto.Adapters.SQL.Sandbox
-
       # The default endpoint for testing
       @endpoint EventManagerWeb.Endpoint
     end
   end
 
   setup tags do
+    alias Ecto.Adapters.SQL.Sandbox
+
     :ok = Sandbox.checkout(EventManager.Repo)
 
     unless tags[:async] do
