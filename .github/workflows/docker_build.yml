@@ -1,0 +1,74 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: elixir:1.9.2-slim
+    services:
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_USER: event_manager
+          POSTGRES_PASSWORD: event_manager
+          POSTGRES_DB: event_manager_test
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install Dependencies
+        run: |
+          mix local.rebar --force
+          mix local.hex --force
+          mix deps.get
+      - name: Run Tests
+        run: mix test
+        env:
+          POSTGRES_HOST: postgres
+          POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+  lint:
+    runs-on: ubuntu-latest
+    container:
+      image: elixir:1.9.2-slim
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install Dependencies
+        run: |
+          mix local.rebar --force
+          mix local.hex --force
+          mix deps.get
+      - name: Run Linter
+        run: mix credo
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Get Login to AWS ECR
+        id: ecr-login
+        uses: thalesvon/ecr-login@master
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_DEFAULT_OUTPUT: json
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        with:
+          args: 'get-login --no-include-email --region ${AWS_REGION}'
+      - name: 'Docker Login'
+        run: ${{ steps.ecr-login.outputs.login-string }}
+      - name: Build the Docker image
+        run: |
+          docker pull $DOCKER_IMAGE:latest || true
+          docker build . --file Dockerfile --tag $DOCKER_IMAGE:$DOCKER_TAG --tag $DOCKER_IMAGE:latest
+          docker push $DOCKER_IMAGE:$DOCKER_TAG
+          docker push $DOCKER_IMAGE:latest
+        env:
+          DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
+          DOCKER_TAG: ${{ github.sha }}

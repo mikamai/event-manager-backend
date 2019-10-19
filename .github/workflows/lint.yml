@@ -1,9 +1,13 @@
-name: Elixir Lint
+name: Elixir Lint PR
 
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore:
+      - master
+  pull_request:
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
     container:
       image: elixir:1.9.2-slim
