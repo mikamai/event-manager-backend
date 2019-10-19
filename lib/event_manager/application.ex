@@ -9,7 +9,7 @@ defmodule EventManager.Application do
       EventManagerWeb.Endpoint,
       {Absinthe.Subscription, [EventManagerWeb.Endpoint]},
       {OpenIDConnect.Worker, Application.get_env(:event_manager, :openid_connect_providers)},
-      EventManager.PubSub.Handlers
+      {EventManager.PubSub.Handlers, [EventManager.PubSub.EventCreated]}
     ]
 
     opts = [strategy: :one_for_one, name: EventManager.Supervisor]

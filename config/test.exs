@@ -1,5 +1,7 @@
 import Config
 
+config :gettext, :default_locale, "en"
+
 # Configure your database
 config :event_manager,
        EventManager.Repo,

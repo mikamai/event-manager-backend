@@ -8,6 +8,14 @@ defmodule EventManager.Events do
 
   alias EventManager.Events.Event
 
+  def data do
+    Dataloader.Ecto.new(EventManager.Repo, query: &query/2)
+  end
+
+  def query(queryable, _params) do
+    queryable
+  end
+
   @doc """
   Returns the list of events.
 
@@ -55,15 +63,15 @@ defmodule EventManager.Events do
   @doc """
   Gets a single event.
 
-  Raises `Ecto.NoResultsError` if the Event does not exist.
+  Returns `nil` if the Event does not exist.
 
   ## Examples
 
-      iex> get_event!(123)
+      iex> get_event(123)
       %Event{}
 
-      iex> get_event!(456)
-      ** (Ecto.NoResultsError)
+      iex> get_event(456)
+      nil
 
   """
   def get_event(id), do: Repo.get(Event, id)
@@ -80,7 +88,16 @@ defmodule EventManager.Events do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_event(attrs \\ %{}) do
+  def create_event(attrs \\ %{})
+
+  def create_event(%{creator: creator} = attrs) do
+    %Event{}
+    |> Event.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:creator, creator)
+    |> Repo.insert()
+  end
+
+  def create_event(attrs) do
     %Event{}
     |> Event.changeset(attrs)
     |> Repo.insert()
@@ -131,5 +148,10 @@ defmodule EventManager.Events do
   """
   def change_event(%Event{} = event) do
     Event.changeset(event, %{})
+  end
+
+  def get_event_creator(%Event{} = event) do
+    Ecto.assoc(event, :creator)
+    |> Repo.one!()
   end
 end

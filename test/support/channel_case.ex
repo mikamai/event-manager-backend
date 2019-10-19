@@ -26,10 +26,12 @@ defmodule EventManagerWeb.ChannelCase do
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(EventManager.Repo)
+    alias Ecto.Adapters.SQL.Sandbox
+
+    :ok = Sandbox.checkout(EventManager.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(EventManager.Repo, {:shared, self()})
+      Sandbox.mode(EventManager.Repo, {:shared, self()})
     end
 
     :ok

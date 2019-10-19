@@ -26,13 +26,34 @@ defmodule EventManager.DataCase do
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(EventManager.Repo)
+    alias Ecto.Adapters.SQL.Sandbox
+
+    :ok = Sandbox.checkout(EventManager.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(EventManager.Repo, {:shared, self()})
+      Sandbox.mode(EventManager.Repo, {:shared, self()})
     end
 
     :ok
+  end
+
+  alias EventManager.Users
+
+  def user_fixture(attrs \\ %{}) do
+    {:ok, user} =
+      attrs
+      |> Enum.into(%{
+        id: Ecto.UUID.generate(),
+        email: "user@example.com",
+        name: "Fake User",
+        username: "user",
+        first_name: "Fake",
+        last_name: "User",
+        locale: "en"
+      })
+      |> Users.create_user()
+
+    user
   end
 
   @doc """
@@ -44,10 +65,19 @@ defmodule EventManager.DataCase do
 
   """
   def errors_on(changeset) do
-    Ecto.Changeset.traverse_errors(changeset, fn {message, opts} ->
-      Regex.replace(~r"%{(\w+)}", message, fn _, key ->
-        opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
-      end)
-    end)
+    Ecto.Changeset.traverse_errors(
+      changeset,
+      fn {message, opts} ->
+        Regex.replace(
+          ~r"%{(\w+)}",
+          message,
+          fn _, key ->
+            opts
+            |> Keyword.get(String.to_existing_atom(key), key)
+            |> to_string()
+          end
+        )
+      end
+    )
   end
 end

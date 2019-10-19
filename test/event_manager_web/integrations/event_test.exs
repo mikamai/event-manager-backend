@@ -1,5 +1,6 @@
 defmodule EventManagerWeb.Schema.EventTest do
-  use ExUnit.Case
+  use EventManager.DataCase
+
   alias EventManager.Events.Event
 
   @schema EventManagerWeb.Schema
@@ -15,14 +16,8 @@ defmodule EventManagerWeb.Schema.EventTest do
     location
   """
 
-  setup do
-    # Explicitly get a connection before each test
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(EventManager.Repo)
-    # Setting the shared mode must be done only after checkout
-  end
-
   def current_user(context \\ %{}),
-    do: Map.put(context, :current_user, %{id: Ecto.UUID.generate()})
+    do: Map.put(context, :current_user, user_fixture())
 
   describe "mutation eventCreate" do
     @mutation """
@@ -38,13 +33,13 @@ defmodule EventManagerWeb.Schema.EventTest do
         "location" => "here",
         "public" => true,
         "startTime" =>
-          NaiveDateTime.utc_now()
-          |> NaiveDateTime.truncate(:second)
-          |> NaiveDateTime.to_iso8601(),
+          DateTime.utc_now()
+          |> DateTime.truncate(:second)
+          |> DateTime.to_iso8601(),
         "endTime" =>
-          NaiveDateTime.utc_now()
-          |> NaiveDateTime.truncate(:second)
-          |> NaiveDateTime.to_iso8601()
+          DateTime.utc_now()
+          |> DateTime.truncate(:second)
+          |> DateTime.to_iso8601()
       }
 
       {:ok, result} =
@@ -86,9 +81,9 @@ defmodule EventManagerWeb.Schema.EventTest do
         title: "test",
         location: "here",
         public: true,
-        status: 0,
-        start_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
-        end_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+        status: :draft,
+        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
       }
 
       event = EventManager.Repo.insert!(event)
@@ -113,14 +108,14 @@ defmodule EventManagerWeb.Schema.EventTest do
       assert description == event.description
       assert location == event.location
       assert public == event.public
-      assert end_time == event.end_time |> NaiveDateTime.to_iso8601()
-      assert start_time == event.start_time |> NaiveDateTime.to_iso8601()
+      assert end_time == event.end_time |> DateTime.to_iso8601()
+      assert start_time == event.start_time |> DateTime.to_iso8601()
     end
 
     test "responds not found for an nonexistent event" do
       uuid = "550e8400-e29b-41d4-a716-446655440000"
       {:ok, result} = Absinthe.run(@query, @schema, variables: %{"id" => uuid})
-      message = "Event not found by id #{uuid}"
+      message = "event not found by id #{uuid}"
 
       assert %{
                data: %{"event" => nil},
@@ -131,6 +126,7 @@ defmodule EventManagerWeb.Schema.EventTest do
                  }
                ]
              } = result
+
       assert error == message
     end
   end
@@ -143,20 +139,25 @@ defmodule EventManagerWeb.Schema.EventTest do
     """
 
     test "respond to the delete event mutation" do
+      context = current_user()
+
       event = %Event{
         description: "Test",
         title: "test",
         location: "here",
         public: true,
-        status: 0,
-        start_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
-        end_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+        status: :draft,
+        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
       }
 
-      event = EventManager.Repo.insert!(event)
+      event =
+        EventManager.Events.change_event(event)
+        |> Ecto.Changeset.put_assoc(:creator, context.current_user)
+        |> EventManager.Repo.insert!()
 
       {:ok, result} =
-        Absinthe.run(@mutation, @schema, variables: %{"id" => event.id}, context: current_user())
+        Absinthe.run(@mutation, @schema, variables: %{"id" => event.id}, context: context)
 
       assert %{
                data: %{
@@ -176,30 +177,36 @@ defmodule EventManagerWeb.Schema.EventTest do
       assert description == event.description
       assert location == event.location
       assert public == event.public
-      assert end_time == event.end_time |> NaiveDateTime.to_iso8601()
-      assert start_time == event.start_time |> NaiveDateTime.to_iso8601()
+      assert end_time == event.end_time |> DateTime.to_iso8601()
+      assert start_time == event.start_time |> DateTime.to_iso8601()
     end
 
     test "responds invalid status when the event is not in draft status" do
+      context = current_user()
+
       event = %Event{
         description: "Test",
         title: "test",
         location: "here",
         public: true,
         status: :published,
-        start_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
-        end_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
       }
 
-      event = EventManager.Repo.insert!(event)
+      event =
+        EventManager.Events.change_event(event)
+        |> Ecto.Changeset.put_assoc(:creator, context.current_user)
+        |> EventManager.Repo.insert!()
 
-      {:ok, result} = Absinthe.run(@mutation, @schema, variables: %{"id" => event.id})
+      {:ok, result} =
+        Absinthe.run(@mutation, @schema, variables: %{"id" => event.id}, context: context)
 
       assert %{
                data: %{"eventDelete" => nil},
                errors: [
                  %{
-                   message: "Only drafted events can be deleted. Current status: published",
+                   message: "only drafted events can be deleted. Current status: published",
                    path: ["eventDelete"]
                  }
                ]
@@ -208,8 +215,11 @@ defmodule EventManagerWeb.Schema.EventTest do
 
     test "responds not found for an nonexistent event" do
       uuid = "550e8400-e29b-41d4-a716-446655440000"
-      {:ok, result} = Absinthe.run(@mutation, @schema, variables: %{"id" => uuid})
-      message = "Event not found by id #{uuid}"
+
+      {:ok, result} =
+        Absinthe.run(@mutation, @schema, variables: %{"id" => uuid}, context: current_user())
+
+      message = "event not found by id #{uuid}"
 
       assert %{
                data: %{"eventDelete" => nil},
@@ -220,6 +230,7 @@ defmodule EventManagerWeb.Schema.EventTest do
                  }
                ]
              } = result
+
       assert error == message
     end
   end
@@ -232,18 +243,18 @@ defmodule EventManagerWeb.Schema.EventTest do
           title: "test1",
           location: "here",
           public: true,
-          status: 0,
-          start_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
-          end_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+          status: :draft,
+          start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+          end_time: DateTime.utc_now() |> DateTime.truncate(:second)
         },
         %Event{
           description: "Test2",
           title: "test2",
           location: "here",
           public: true,
-          status: 0,
-          start_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
-          end_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+          status: :draft,
+          start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+          end_time: DateTime.utc_now() |> DateTime.truncate(:second)
         }
       ]
       |> Enum.map(&Event.changeset/1)
@@ -280,6 +291,7 @@ defmodule EventManagerWeb.Schema.EventTest do
                    "pageInfo" => %{
                      "hasNextPage" => false,
                      "hasPreviousPage" => false,
+                     # credo:disable-for-next-line Credo.Check.Readability.VariableNames
                      "endCursor" => endCursor
                    }
                  }
@@ -289,6 +301,7 @@ defmodule EventManagerWeb.Schema.EventTest do
 
     test "responds to the events query when using first and after" do
       {:ok, result} = Absinthe.run(@query, @schema, variables: %{"first" => 1})
+      # credo:disable-for-next-line Credo.Check.Readability.VariableNames
       %{data: %{"events" => %{"pageInfo" => %{"endCursor" => endCursor}}}} = result
 
       {:ok, result} =

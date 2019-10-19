@@ -97,17 +97,16 @@ msgid "must be equal to %{number}"
 msgstr ""
 
 #, elixir-format
-#: lib/event_manager_web/resolvers/event.ex:15
-msgid "Event not found by id %{id}"
+#: lib/event_manager_web/resolvers/events.ex:83
+msgid "event not found by id %{id}"
 msgstr ""
 
 #, elixir-format
-#: lib/event_manager_web/resolvers/event.ex:62
-msgid "Only drafted events can be deleted. Current status: %{status}"
+#: lib/event_manager_web/resolvers/events.ex:24
+msgid "unauthorized"
 msgstr ""
 
 #, elixir-format
-#: lib/event_manager_web/resolvers/event.ex:24
-#: lib/event_manager_web/resolvers/event.ex:28
-msgid "Unauthorized"
+#: lib/event_manager_web/resolvers/events.ex:69
+msgid "only drafted events can be deleted. Current status: %{status}"
 msgstr ""

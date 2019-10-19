@@ -1,9 +1,13 @@
 defmodule EventManager.Events.Event do
+  @moduledoc """
+    An event organized by a community
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   import EctoEnum
 
-  defenum(StatusEnum, draft: 0, published: 1, ended: 2, cancelled: 3)
+  defenum(StatusEnum, ["draft", "published", "ended", "cancelled"])
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -13,9 +17,10 @@ defmodule EventManager.Events.Event do
     field :description, :string
     field :location, :string
     field :public, :boolean
-    field :status, StatusEnum
-    field :start_time, :naive_datetime
-    field :end_time, :naive_datetime
+    field :status, StatusEnum, default: "draft"
+    field :start_time, :utc_datetime
+    field :end_time, :utc_datetime
+    belongs_to :creator, EventManager.Users.User, foreign_key: :creator_id
 
     timestamps()
   end
