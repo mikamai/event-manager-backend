@@ -46,7 +46,8 @@ defmodule EventManager.DataCase do
         name: "Fake User",
         username: "user",
         first_name: "Fake",
-        last_name: "User"
+        last_name: "User",
+        locale: "en"
       })
       |> Users.create_user()
 

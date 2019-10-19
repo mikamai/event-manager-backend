@@ -5,6 +5,7 @@ defmodule EventManager.UsersTest do
 
   describe "users" do
     alias EventManager.Users.User
+    alias EventManager.Events.Event
 
     @valid_attrs %{
       id: Ecto.UUID.generate(),
@@ -62,6 +63,57 @@ defmodule EventManager.UsersTest do
     test "change_user/1 returns a user changeset" do
       user = user_fixture()
       assert %Ecto.Changeset{} = Users.change_user(user)
+    end
+
+    test "from_claims/1 returns user params from OIDC claims" do
+      claims = %{
+        "sub" => Ecto.UUID.generate(),
+        "email" => "email@example.com",
+        "name" => "Test User",
+        "given_name" => "Test",
+        "family_name" => "User",
+        "preferred_username" => "test",
+        "locale" => "fr"
+      }
+
+      assert %{
+               id: id,
+               email: email,
+               name: name,
+               first_name: first_name,
+               last_name: last_name,
+               username: username,
+               locale: locale
+             } = Users.from_claims(claims)
+
+      assert id == claims["sub"]
+      assert email == claims["email"]
+      assert name == claims["name"]
+      assert first_name == claims["given_name"]
+      assert last_name == claims["family_name"]
+      assert username == claims["preferred_username"]
+      assert locale == claims["locale"]
+    end
+
+    test "get_created_event/2 returns a specific event created by the user" do
+      user = user_fixture()
+
+      event = %Event{
+        description: "Test",
+        title: "test",
+        location: "here",
+        public: true,
+        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
+      }
+
+      event =
+        EventManager.Events.change_event(event)
+        |> Ecto.Changeset.put_assoc(:creator, user)
+        |> EventManager.Repo.insert!()
+
+      assert %Event{id: id} = Users.get_created_event(user, event.id)
+      assert id == event.id
     end
   end
 end

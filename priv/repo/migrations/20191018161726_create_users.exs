@@ -1,7 +1,7 @@
 defmodule EventManager.Repo.Migrations.CreateUsers do
   use Ecto.Migration
 
-  def change do
+  def up do
     create table(:users, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :email, :string, null: false
@@ -9,6 +9,8 @@ defmodule EventManager.Repo.Migrations.CreateUsers do
       add :username, :string, null: false
       add :first_name, :string, null: false
       add :last_name, :string, null: false
+      add :locale, :string, null: false, default: Application.get_env(:gettext, :default_locale)
+
       timestamps()
     end
 
@@ -16,6 +18,14 @@ defmodule EventManager.Repo.Migrations.CreateUsers do
 
     alter table(:events) do
       add :creator_id, references(:users)
+    end
+  end
+
+  def down do
+    drop table(:users)
+
+    alter table(:events) do
+      remove :creator_id
     end
   end
 end

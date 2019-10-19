@@ -8,8 +8,8 @@ defmodule EventManagerWeb.Types.Event do
     field(:description, non_null(:string))
     field(:location, non_null(:string))
     field(:public, :boolean, default_value: false)
-    field(:start_time, non_null(:naive_datetime))
-    field(:end_time, non_null(:naive_datetime))
+    field(:start_time, non_null(:datetime))
+    field(:end_time, non_null(:datetime))
   end
 
   enum :event_state do
@@ -27,8 +27,8 @@ defmodule EventManagerWeb.Types.Event do
     field(:location, non_null(:string))
     field(:public, non_null(:boolean))
     field(:status, non_null(:event_state))
-    field(:start_time, non_null(:naive_datetime))
-    field(:end_time, non_null(:naive_datetime))
+    field(:start_time, non_null(:datetime))
+    field(:end_time, non_null(:datetime))
 
     field(:creator, non_null(:user), resolve: dataloader(EventManager.Events))
   end

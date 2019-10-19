@@ -33,13 +33,13 @@ defmodule EventManagerWeb.Schema.EventTest do
         "location" => "here",
         "public" => true,
         "startTime" =>
-          NaiveDateTime.utc_now()
-          |> NaiveDateTime.truncate(:second)
-          |> NaiveDateTime.to_iso8601(),
+          DateTime.utc_now()
+          |> DateTime.truncate(:second)
+          |> DateTime.to_iso8601(),
         "endTime" =>
-          NaiveDateTime.utc_now()
-          |> NaiveDateTime.truncate(:second)
-          |> NaiveDateTime.to_iso8601()
+          DateTime.utc_now()
+          |> DateTime.truncate(:second)
+          |> DateTime.to_iso8601()
       }
 
       {:ok, result} =
@@ -81,9 +81,9 @@ defmodule EventManagerWeb.Schema.EventTest do
         title: "test",
         location: "here",
         public: true,
-        status: 0,
-        start_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
-        end_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+        status: :draft,
+        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
       }
 
       event = EventManager.Repo.insert!(event)
@@ -108,14 +108,14 @@ defmodule EventManagerWeb.Schema.EventTest do
       assert description == event.description
       assert location == event.location
       assert public == event.public
-      assert end_time == event.end_time |> NaiveDateTime.to_iso8601()
-      assert start_time == event.start_time |> NaiveDateTime.to_iso8601()
+      assert end_time == event.end_time |> DateTime.to_iso8601()
+      assert start_time == event.start_time |> DateTime.to_iso8601()
     end
 
     test "responds not found for an nonexistent event" do
       uuid = "550e8400-e29b-41d4-a716-446655440000"
       {:ok, result} = Absinthe.run(@query, @schema, variables: %{"id" => uuid})
-      message = "Event not found by id #{uuid}"
+      message = "event not found by id #{uuid}"
 
       assert %{
                data: %{"event" => nil},
@@ -146,9 +146,9 @@ defmodule EventManagerWeb.Schema.EventTest do
         title: "test",
         location: "here",
         public: true,
-        status: 0,
-        start_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
-        end_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+        status: :draft,
+        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
       }
 
       event =
@@ -177,8 +177,8 @@ defmodule EventManagerWeb.Schema.EventTest do
       assert description == event.description
       assert location == event.location
       assert public == event.public
-      assert end_time == event.end_time |> NaiveDateTime.to_iso8601()
-      assert start_time == event.start_time |> NaiveDateTime.to_iso8601()
+      assert end_time == event.end_time |> DateTime.to_iso8601()
+      assert start_time == event.start_time |> DateTime.to_iso8601()
     end
 
     test "responds invalid status when the event is not in draft status" do
@@ -190,8 +190,8 @@ defmodule EventManagerWeb.Schema.EventTest do
         location: "here",
         public: true,
         status: :published,
-        start_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
-        end_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
       }
 
       event =
@@ -206,7 +206,7 @@ defmodule EventManagerWeb.Schema.EventTest do
                data: %{"eventDelete" => nil},
                errors: [
                  %{
-                   message: "Only drafted events can be deleted. Current status: published",
+                   message: "only drafted events can be deleted. Current status: published",
                    path: ["eventDelete"]
                  }
                ]
@@ -219,7 +219,7 @@ defmodule EventManagerWeb.Schema.EventTest do
       {:ok, result} =
         Absinthe.run(@mutation, @schema, variables: %{"id" => uuid}, context: current_user())
 
-      message = "Event not found by id #{uuid}"
+      message = "event not found by id #{uuid}"
 
       assert %{
                data: %{"eventDelete" => nil},
@@ -243,18 +243,18 @@ defmodule EventManagerWeb.Schema.EventTest do
           title: "test1",
           location: "here",
           public: true,
-          status: 0,
-          start_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
-          end_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+          status: :draft,
+          start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+          end_time: DateTime.utc_now() |> DateTime.truncate(:second)
         },
         %Event{
           description: "Test2",
           title: "test2",
           location: "here",
           public: true,
-          status: 0,
-          start_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second),
-          end_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+          status: :draft,
+          start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+          end_time: DateTime.utc_now() |> DateTime.truncate(:second)
         }
       ]
       |> Enum.map(&Event.changeset/1)
