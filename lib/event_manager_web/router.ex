@@ -1,8 +1,6 @@
 defmodule EventManagerWeb.Router do
   use EventManagerWeb, :router
 
-  alias EventManagerWeb.HealthController
-
   pipeline :graphql do
     plug :accepts, ["json"]
     plug EventManagerWeb.Context
