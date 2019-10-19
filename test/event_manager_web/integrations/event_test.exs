@@ -1,5 +1,6 @@
 defmodule EventManagerWeb.Schema.EventTest do
-  use ExUnit.Case
+  use EventManager.DataCase
+
   alias EventManager.Events.Event
 
   @schema EventManagerWeb.Schema
@@ -15,14 +16,8 @@ defmodule EventManagerWeb.Schema.EventTest do
     location
   """
 
-  setup do
-    # Explicitly get a connection before each test
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(EventManager.Repo)
-    # Setting the shared mode must be done only after checkout
-  end
-
   def current_user(context \\ %{}),
-    do: Map.put(context, :current_user, %{id: Ecto.UUID.generate()})
+    do: Map.put(context, :current_user, user_fixture())
 
   describe "mutation eventCreate" do
     @mutation """
@@ -144,6 +139,8 @@ defmodule EventManagerWeb.Schema.EventTest do
     """
 
     test "respond to the delete event mutation" do
+      context = current_user()
+
       event = %Event{
         description: "Test",
         title: "test",
@@ -154,10 +151,13 @@ defmodule EventManagerWeb.Schema.EventTest do
         end_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       }
 
-      event = EventManager.Repo.insert!(event)
+      event =
+        EventManager.Events.change_event(event)
+        |> Ecto.Changeset.put_assoc(:creator, context.current_user)
+        |> EventManager.Repo.insert!()
 
       {:ok, result} =
-        Absinthe.run(@mutation, @schema, variables: %{"id" => event.id}, context: current_user())
+        Absinthe.run(@mutation, @schema, variables: %{"id" => event.id}, context: context)
 
       assert %{
                data: %{
@@ -182,6 +182,8 @@ defmodule EventManagerWeb.Schema.EventTest do
     end
 
     test "responds invalid status when the event is not in draft status" do
+      context = current_user()
+
       event = %Event{
         description: "Test",
         title: "test",
@@ -192,9 +194,13 @@ defmodule EventManagerWeb.Schema.EventTest do
         end_time: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       }
 
-      event = EventManager.Repo.insert!(event)
+      event =
+        EventManager.Events.change_event(event)
+        |> Ecto.Changeset.put_assoc(:creator, context.current_user)
+        |> EventManager.Repo.insert!()
 
-      {:ok, result} = Absinthe.run(@mutation, @schema, variables: %{"id" => event.id})
+      {:ok, result} =
+        Absinthe.run(@mutation, @schema, variables: %{"id" => event.id}, context: context)
 
       assert %{
                data: %{"eventDelete" => nil},
@@ -209,7 +215,10 @@ defmodule EventManagerWeb.Schema.EventTest do
 
     test "responds not found for an nonexistent event" do
       uuid = "550e8400-e29b-41d4-a716-446655440000"
-      {:ok, result} = Absinthe.run(@mutation, @schema, variables: %{"id" => uuid})
+
+      {:ok, result} =
+        Absinthe.run(@mutation, @schema, variables: %{"id" => uuid}, context: current_user())
+
       message = "Event not found by id #{uuid}"
 
       assert %{

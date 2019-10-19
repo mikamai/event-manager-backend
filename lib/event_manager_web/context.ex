@@ -38,16 +38,17 @@ defmodule EventManagerWeb.Context do
           {:error, "token expired"}
         else
           params = Users.from_claims(claims)
-          IO.inspect(params)
-          result = if user = Users.get_user(params.id) do
-            Users.update_user(user, params)
-          else
-            Users.create_user(params)
-          end
+
+          result =
+            if user = Users.get_user(params.id) do
+              Users.update_user(user, params)
+            else
+              Users.create_user(params)
+            end
 
           case result do
             {:ok, user} -> {:ok, user}
-             {:error, changeset} -> {:error, changeset.errors}
+            {:error, changeset} -> {:error, changeset.errors}
           end
         end
 

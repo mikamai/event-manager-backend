@@ -35,6 +35,7 @@ defmodule EventManager.MixProject do
     [
       {:absinthe_phoenix, "~> 1.4"},
       {:absinthe_relay, "~> 1.4"},
+      {:dataloader, "~> 1.0.0"},
       {:phoenix, "~> 1.4.10"},
       {:phoenix_pubsub, "~> 1.1"},
       {:phoenix_ecto, "~> 4.0"},

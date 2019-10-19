@@ -7,11 +7,12 @@ defmodule EventManager.UsersTest do
     alias EventManager.Users.User
 
     @valid_attrs %{
+      id: Ecto.UUID.generate(),
       email: "user@example.com",
       name: "Fake User",
       username: "user",
       first_name: "Fake",
-      last_name: "User",
+      last_name: "User"
     }
 
     @update_attrs %{
@@ -20,17 +21,8 @@ defmodule EventManager.UsersTest do
 
     @invalid_attrs %{
       email: 1,
-      name: nil,
+      name: nil
     }
-
-    def user_fixture(attrs \\ %{}) do
-      {:ok, user} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Users.create_user()
-
-      user
-    end
 
     test "list_users/0 returns all users" do
       user = user_fixture()

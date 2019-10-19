@@ -1,26 +1,11 @@
-defmodule EventManagerWeb.Resolvers.Event do
+defmodule EventManagerWeb.Resolvers.Events do
   alias Phoenix.PubSub
   alias EventManager.Events
+  alias EventManager.Users
   import EventManagerWeb.Gettext
 
-  def get_event(%{id: ""}, _info) do
-    {:error, "event.not_found"}
-  end
-
-  def get_event(%{id: id}, _info) when is_binary(id) do
-    with {:ok, uuid} <- Ecto.UUID.cast(id),
-         event when not is_nil(event) <- Events.get_event(uuid) do
-      {:ok, event}
-    else
-      _ -> {:error, dgettext("errors", "Event not found by id %{id}", id: id)}
-    end
-  end
-
-  def get_event(%{id: id}, _info) do
-    case EventManager.Repo.get(Event, id) do
-      nil -> {:error, "event.not_found"}
-      event -> {:ok, event}
-    end
+  def get_event(params, _info) do
+    do_get_event(params, &Events.get_event/1)
   end
 
   def events(pagination_args, _info) do
@@ -41,11 +26,12 @@ defmodule EventManagerWeb.Resolvers.Event do
 
   def create_event(%{event: event}, %{context: %{current_user: current_user}}) do
     case Map.put(event, :status, :draft)
-         |> Map.put(:creator_id, current_user.id)
+         |> Map.put(:creator, current_user)
          |> Events.create_event() do
-      {:ok, struct} ->
-        PubSub.broadcast(EventManager.PubSub, "user:created", {:user_created, struct})
-        {:ok, struct}
+      {:ok, created} ->
+        created |> Ecto.assoc(:creator)
+        PubSub.broadcast(EventManager.PubSub, "event:created", {:event_created, created})
+        {:ok, created}
 
       {:error, changeset} ->
         {:error, changeset.errors}
@@ -56,13 +42,18 @@ defmodule EventManagerWeb.Resolvers.Event do
           %{event: :invalid | %{optional(:__struct__) => none, optional(atom | binary) => any}},
           any
         ) :: {:error, any} | {:ok, any}
-  def delete_event(params, info) do
-    with {:ok, event} <- get_event(params, info),
+  def delete_event(params, %{context: %{current_user: current_user}}) do
+    with {:ok, event} <- do_get_event(params, &Users.get_created_event(current_user, &1)),
          {:ok, deleted} <- do_delete(event) do
       {:ok, deleted}
     else
       {:error, errors} -> {:error, errors}
     end
+  end
+
+  def event_creator(event, _, _) do
+    creator = EventManager.Events.get_event_creator(event)
+    {:ok, creator}
   end
 
   defp do_delete(%Events.Event{status: :draft} = event) do
@@ -78,4 +69,18 @@ defmodule EventManagerWeb.Resolvers.Event do
        dgettext("errors", "Only drafted events can be deleted. Current status: %{status}",
          status: status
        )}
+
+  defp do_get_event(%{id: ""}, _) do
+    {:error, "event.not_found"}
+  end
+
+  #  @spec do_get_event(Map.t(), )
+  defp do_get_event(%{id: id}, get_fun) when is_binary(id) do
+    with {:ok, uuid} <- Ecto.UUID.cast(id),
+         event when not is_nil(event) <- get_fun.(uuid) do
+      {:ok, event}
+    else
+      _ -> {:error, dgettext("errors", "Event not found by id %{id}", id: id)}
+    end
+  end
 end

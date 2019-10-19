@@ -1,7 +1,9 @@
 defmodule EventManagerWeb.Schema do
   use Absinthe.Schema
 
+  import_types(Absinthe.Type.Custom)
   import_types(EventManagerWeb.Types.CurrentUser)
+  import_types(EventManagerWeb.Types.User)
   import_types(EventManagerWeb.Schema.Events)
 
   query do
@@ -14,5 +16,18 @@ defmodule EventManagerWeb.Schema do
 
   mutation do
     import_fields(:event_mutations)
+  end
+
+  def context(ctx) do
+    loader =
+      Dataloader.new()
+      |> Dataloader.add_source(EventManager.Events, EventManager.Events.data())
+      |> Dataloader.add_source(EventManager.Users, EventManager.Users.data())
+
+    Map.put(ctx, :loader, loader)
+  end
+
+  def plugins() do
+    [Absinthe.Middleware.Dataloader] ++ Absinthe.Plugin.defaults()
   end
 end

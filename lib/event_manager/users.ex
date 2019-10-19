@@ -7,6 +7,15 @@ defmodule EventManager.Users do
   alias EventManager.Repo
 
   alias EventManager.Users.User
+  alias EventManager.Events.Event
+
+  def data() do
+    Dataloader.Ecto.new(EventManager.Repo, query: &query/2)
+  end
+
+  def query(queryable, _params) do
+    queryable
+  end
 
   @doc """
   Returns the list of users.
@@ -118,6 +127,11 @@ defmodule EventManager.Users do
     User.changeset(user, %{})
   end
 
+  def get_created_event(%User{} = user, event_id) do
+    Ecto.assoc(user, :created_events)
+    |> Repo.get(event_id)
+  end
+
   @doc """
   Returns a `Map` of user params built from the given OpenID claims.
 
@@ -126,16 +140,15 @@ defmodule EventManager.Users do
       iex> from_claims(claims)
       %{id: claims["sub"], ...}
   """
-  def from_claims(
-        %{
-          "sub" => id,
-          "email" => email,
-          "name" => name,
-          "given_name" => first_name,
-          "family_name" => last_name,
-          "preferred_username" => username
-        }
-      ), do: %{
+  def from_claims(%{
+        "sub" => id,
+        "email" => email,
+        "name" => name,
+        "given_name" => first_name,
+        "family_name" => last_name,
+        "preferred_username" => username
+      }),
+      do: %{
         id: id,
         email: email,
         name: name,

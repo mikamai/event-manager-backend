@@ -8,6 +8,14 @@ defmodule EventManager.Events do
 
   alias EventManager.Events.Event
 
+  def data() do
+    Dataloader.Ecto.new(EventManager.Repo, query: &query/2)
+  end
+
+  def query(queryable, _params) do
+    queryable
+  end
+
   @doc """
   Returns the list of events.
 
@@ -80,7 +88,16 @@ defmodule EventManager.Events do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_event(attrs \\ %{}) do
+  def create_event(attrs \\ %{})
+
+  def create_event(%{creator: creator} = attrs) do
+    %Event{}
+    |> Event.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:creator, creator)
+    |> Repo.insert()
+  end
+
+  def create_event(attrs) do
     %Event{}
     |> Event.changeset(attrs)
     |> Repo.insert()
@@ -134,6 +151,8 @@ defmodule EventManager.Events do
   end
 
   def get_event_creator(%Event{} = event) do
+    IO.inspect(event)
+
     Ecto.assoc(event, :creator)
     |> Repo.one!()
   end
