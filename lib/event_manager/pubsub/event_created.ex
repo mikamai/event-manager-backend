@@ -1,5 +1,6 @@
 defmodule EventManager.PubSub.EventCreated do
   use EventManager.PubSub.Handler, topic: "event:created"
+
   require Logger
 
   @impl true

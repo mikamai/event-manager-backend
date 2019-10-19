@@ -45,7 +45,7 @@ defmodule EventManagerWeb.Resolvers.Events do
   def delete_event(_args, %{context: %{current_user: nil}}) do
     {:error, dgettext("errors", "unauthorized")}
   end
-  
+
   def delete_event(params, %{context: %{current_user: current_user}}) do
     with {:ok, event} <- do_get_event(params, &Users.get_created_event(current_user, &1)),
          {:ok, deleted} <- do_delete(event) do

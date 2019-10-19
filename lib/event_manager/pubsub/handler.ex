@@ -1,4 +1,21 @@
 defmodule EventManager.PubSub.Handler do
+  @moduledoc """
+    Behaviour for async handlers, using Phoenix.PubSub
+  """
+
+  @doc """
+  Handle a message from the subscribed topic
+
+  ## Examples
+
+      use EventManager.PubSub.Handler, topic: "event:created"
+
+      @impl true
+      def handle({:event_created, event}) do
+        Logger.info("[event:created] Received event: \#{inspect(event)}")
+      end
+
+  """
   @callback handle({atom(), any()}) :: :ok | {:error, String.t()}
 
   defmacro __using__(topic: topic) do
