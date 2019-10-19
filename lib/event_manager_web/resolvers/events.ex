@@ -20,7 +20,7 @@ defmodule EventManagerWeb.Resolvers.Events do
           %{event: :invalid | %{optional(:__struct__) => none, optional(atom | binary) => any}},
           any
         ) :: {:error, any} | {:ok, any}
-  def create_event(args, %{context: %{current_user: nil}}) do
+  def create_event(_args, %{context: %{current_user: nil}}) do
     {:error, dgettext("errors", "Unauthorized")}
   end
 
