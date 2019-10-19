@@ -1,7 +1,13 @@
 defmodule EventManagerWeb.Resolvers.Events do
-  alias Phoenix.PubSub
+  @moduledoc """
+    Resolvers for Event objects and related queries
+  """
+
+  alias Absinthe.Relay.Connection
   alias EventManager.Events
   alias EventManager.Users
+  alias Phoenix.PubSub
+
   import EventManagerWeb.Gettext
 
   def get_event(params, _info) do
@@ -9,11 +15,11 @@ defmodule EventManagerWeb.Resolvers.Events do
   end
 
   def events(pagination_args, _info) do
-    {:ok, _direction, limit} = Absinthe.Relay.Connection.limit(pagination_args)
-    {:ok, offset} = Absinthe.Relay.Connection.offset(pagination_args)
+    {:ok, _direction, limit} = Connection.limit(pagination_args)
+    {:ok, offset} = Connection.offset(pagination_args)
 
     Events.list_events(limit, offset)
-    |> Absinthe.Relay.Connection.from_slice(offset)
+    |> Connection.from_slice(offset)
   end
 
   @spec create_event(

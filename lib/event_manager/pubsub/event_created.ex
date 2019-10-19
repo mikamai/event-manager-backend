@@ -1,4 +1,8 @@
 defmodule EventManager.PubSub.EventCreated do
+  @moduledoc """
+    Do stuff with new events when they are created
+  """
+
   use EventManager.PubSub.Handler, topic: "event:created"
 
   require Logger

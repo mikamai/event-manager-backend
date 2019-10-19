@@ -291,6 +291,7 @@ defmodule EventManagerWeb.Schema.EventTest do
                    "pageInfo" => %{
                      "hasNextPage" => false,
                      "hasPreviousPage" => false,
+                     # credo:disable-for-next-line Credo.Check.Readability.VariableNames
                      "endCursor" => endCursor
                    }
                  }
@@ -300,6 +301,7 @@ defmodule EventManagerWeb.Schema.EventTest do
 
     test "responds to the events query when using first and after" do
       {:ok, result} = Absinthe.run(@query, @schema, variables: %{"first" => 1})
+      # credo:disable-for-next-line Credo.Check.Readability.VariableNames
       %{data: %{"events" => %{"pageInfo" => %{"endCursor" => endCursor}}}} = result
 
       {:ok, result} =

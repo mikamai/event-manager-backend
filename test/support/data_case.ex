@@ -16,6 +16,7 @@ defmodule EventManager.DataCase do
 
   using do
     quote do
+      alias Ecto.Adapters.SQL.Sandbox
       alias EventManager.Repo
 
       import Ecto
@@ -26,10 +27,10 @@ defmodule EventManager.DataCase do
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(EventManager.Repo)
+    :ok = Sandbox.checkout(EventManager.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(EventManager.Repo, {:shared, self()})
+      Sandbox.mode(EventManager.Repo, {:shared, self()})
     end
 
     :ok

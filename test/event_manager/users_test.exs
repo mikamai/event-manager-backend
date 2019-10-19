@@ -4,8 +4,8 @@ defmodule EventManager.UsersTest do
   alias EventManager.Users
 
   describe "users" do
-    alias EventManager.Users.User
     alias EventManager.Events.Event
+    alias EventManager.Users.User
 
     @valid_attrs %{
       id: Ecto.UUID.generate(),

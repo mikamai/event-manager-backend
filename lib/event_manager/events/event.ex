@@ -1,4 +1,8 @@
 defmodule EventManager.Events.Event do
+  @moduledoc """
+    An event organized by a community
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   import EctoEnum

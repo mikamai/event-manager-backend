@@ -8,7 +8,7 @@ defmodule EventManager.Events do
 
   alias EventManager.Events.Event
 
-  def data() do
+  def data do
     Dataloader.Ecto.new(EventManager.Repo, query: &query/2)
   end
 
@@ -151,8 +151,6 @@ defmodule EventManager.Events do
   end
 
   def get_event_creator(%Event{} = event) do
-    IO.inspect(event)
-
     Ecto.assoc(event, :creator)
     |> Repo.one!()
   end

@@ -8,7 +8,7 @@ defmodule EventManager.Users do
 
   alias EventManager.Users.User
 
-  def data() do
+  def data do
     Dataloader.Ecto.new(EventManager.Repo, query: &query/2)
   end
 

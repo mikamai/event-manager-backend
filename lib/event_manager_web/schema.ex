@@ -1,4 +1,8 @@
 defmodule EventManagerWeb.Schema do
+  @moduledoc """
+    Public GraphQL schema
+  """
+
   use Absinthe.Schema
 
   import_types(Absinthe.Type.Custom)
@@ -27,7 +31,7 @@ defmodule EventManagerWeb.Schema do
     Map.put(ctx, :loader, loader)
   end
 
-  def plugins() do
+  def plugins do
     [Absinthe.Middleware.Dataloader] ++ Absinthe.Plugin.defaults()
   end
 end

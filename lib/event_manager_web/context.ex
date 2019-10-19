@@ -1,4 +1,10 @@
 defmodule EventManagerWeb.Context do
+  @moduledoc """
+    Plug to set the Absinthe context with
+    the current user, taken from an OpenID Connect access
+    token
+  """
+
   @behaviour Plug
 
   import Plug.Conn

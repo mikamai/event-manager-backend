@@ -1,4 +1,8 @@
 defmodule EventManagerWeb.Types.CurrentUser do
+  @moduledoc """
+    GraphQL type for representing the current authenticated user
+  """
+
   use Absinthe.Schema.Notation
 
   object :current_user do

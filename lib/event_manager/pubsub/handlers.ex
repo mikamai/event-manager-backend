@@ -1,4 +1,8 @@
 defmodule EventManager.PubSub.Handlers do
+  @moduledoc """
+    Supervisor that starts async PubSub handlers
+  """
+
   use Supervisor
 
   def start_link(args) do

@@ -1,4 +1,7 @@
 defmodule EventManager.Users.User do
+  @moduledoc """
+    A user from the OpenID Connect provider
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

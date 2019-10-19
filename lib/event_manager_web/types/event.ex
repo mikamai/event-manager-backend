@@ -1,4 +1,8 @@
 defmodule EventManagerWeb.Types.Event do
+  @moduledoc """
+    GraphQL types for Events
+  """
+
   use Absinthe.Schema.Notation
   use Absinthe.Relay.Schema, :modern
   import Absinthe.Resolution.Helpers, only: [dataloader: 1]

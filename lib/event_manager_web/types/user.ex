@@ -1,4 +1,7 @@
 defmodule EventManagerWeb.Types.User do
+  @moduledoc """
+    GraphQL types for Users
+  """
   use Absinthe.Schema.Notation
 
   object :user do
