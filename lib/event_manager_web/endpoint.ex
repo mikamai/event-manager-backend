@@ -2,6 +2,8 @@ defmodule EventManagerWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :event_manager
   use Absinthe.Phoenix.Endpoint, schema: EventManagerWeb.Schema
 
+  plug EventManagerWeb.HealthCheckPlug
+
   socket "/socket", EventManagerWeb.UserSocket,
     websocket: true,
     longpoll: false

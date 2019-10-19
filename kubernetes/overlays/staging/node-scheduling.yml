@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-manager-backend
+spec:
+  template:
+    spec:
+      nodeSelector:
+        mikamai.com/reserved-for: event-manager
+        mikamai.com/environment: staging
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - event-manager-backend
+                topologyKey: kubernetes.io/hostname
+      tolerations:
+      - key: mikamai.com/environment
+        operator: Equal
+        value: staging
+        effect: NoSchedule
+      - key: mikamai.com/reserved-for
+        operator: Equal
+        value: event-manager
+        effect: NoSchedule

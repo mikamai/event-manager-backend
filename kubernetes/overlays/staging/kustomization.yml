@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: event-manager-staging
+
+bases:
+  - ../../base
+
+resources:
+  - ingress.yml
+
+patchesStrategicMerge:
+  - node-scheduling.yml
+
+configMapGenerator:
+  - name: backend-config
+    literals:
+      - MIX_ENV=production
+      - SENTRY_CURRENT_ENV=staging
+      - DEFAULT_LANGUAGE=it

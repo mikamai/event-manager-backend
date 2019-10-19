@@ -2,16 +2,21 @@ import Config
 
 config :gettext, :default_locale, System.get_env("DEFAULT_LOCALE", "it")
 
-database_url =
-  System.get_env("DATABASE_URL") ||
-    raise """
-    environment variable DATABASE_URL is missing.
-    For example: ecto://USER:PASS@HOST/DATABASE
-    """
+database_url = System.get_env("DATABASE_URL")
+pool_size = String.to_integer(System.get_env("POOL_SIZE") || "10")
 
-config :event_manager, EventManager.Repo,
-  url: database_url,
-  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
+if database_url do
+  config :event_manager, EventManager.Repo,
+    url: database_url,
+    pool_size: pool_size
+else
+  config :event_manager, EventManager.Repo,
+    username: System.get_env("POSTGRES_USER"),
+    password: System.get_env("POSTGRES_PASSWORD"),
+    database: System.get_env("POSTGRES_DB"),
+    hostname: System.get_env("POSTGRES_HOST"),
+    pool_size: pool_size
+end
 
 secret_key_base =
   System.get_env("SECRET_KEY_BASE") ||

@@ -1,4 +1,4 @@
-name: Elixir Lint PR
+name: Elixir Linting
 
 on:
   push:

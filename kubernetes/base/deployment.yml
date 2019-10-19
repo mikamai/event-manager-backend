@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-manager-backend
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: "30%"
+      maxUnavailable: "30%"
+  selector:
+    matchLabels:
+      app: event-manager-backend
+  template:
+    spec:
+      imagePullSecrets:
+        - name: ecr
+      containers:
+        - name: service
+          image: mikamai/event-manager:latest # Coming soon
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 4000
+              name: http
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+          envFrom:
+            - configMapRef:
+                name: backend-config
+            - secretRef:
+                name: backend-secrets
+            - secretRef:
+                name: db-secrets
+            - secretRef:
+                name: cloud-credentials
+      initContainers:
+        - name: migrator
+          image: mikamai/event-manager:latest # Coming soon
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: backend-config
+            - secretRef:
+                name: backend-secrets
+            - secretRef:
+                name: db-secrets
+          command: ["bin/event_manager"]
+          args: ["eval", "EventManager.Release.migrate"]
