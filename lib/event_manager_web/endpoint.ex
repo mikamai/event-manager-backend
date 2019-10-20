@@ -1,6 +1,7 @@
 defmodule EventManagerWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :event_manager
   use Absinthe.Phoenix.Endpoint, schema: EventManagerWeb.Schema
+  use Sentry.Phoenix.Endpoint
 
   plug EventManagerWeb.HealthCheckPlug
 

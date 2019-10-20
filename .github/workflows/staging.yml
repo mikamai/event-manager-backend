@@ -91,3 +91,22 @@ jobs:
         env:
           DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
           DOCKER_TAG: ${{ github.sha }}
+  sentry:
+    runs-on: ubuntu-latest
+    needs: deploy
+    container:
+      image: getsentry/sentry-cli:1.47
+    steps:
+      - uses: actions/checkout@v1
+      - name: Create Sentry release
+        runs: |
+          sentry-cli releases new $RELEASE_TAG
+          sentry-cli releases set-commits $RELEASE_TAG --auto
+          sentry-cli releases deploys $RELEASE_TAG new -e staging
+          sentry-cli releases finalize $RELEASE_TAG
+        env:
+          RELEASE_TAG: ${{ github.sha }}
+          SENTRY_URL: ${{ secrets.SENTRY_URL }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}

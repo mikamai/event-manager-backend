@@ -12,6 +12,8 @@ defmodule EventManager.Application do
       {EventManager.PubSub.Handlers, [EventManager.PubSub.EventCreated]}
     ]
 
+    {:ok, _} = Logger.add_backend(Sentry.LoggerBackend)
+
     opts = [strategy: :one_for_one, name: EventManager.Supervisor]
     Supervisor.start_link(children, opts)
   end

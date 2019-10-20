@@ -29,6 +29,7 @@ defmodule EventManagerWeb.Context do
   def build_context(conn) do
     with ["Bearer " <> token] <- get_req_header(conn, "authorization"),
          {:ok, current_user} <- authorize(token) do
+      Sentry.Context.set_user_context(current_user)
       %{current_user: current_user}
     else
       {:error, reason} ->
@@ -70,6 +71,7 @@ defmodule EventManagerWeb.Context do
 
   defp set_locale(%{current_user: current_user} = context) do
     Gettext.put_locale(current_user.locale)
+    Sentry.Context.set_tags_context(%{locale: Gettext.get_locale()})
     context
   end
 end

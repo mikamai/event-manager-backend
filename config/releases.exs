@@ -1,6 +1,7 @@
 import Config
 
-config :gettext, :default_locale, System.get_env("DEFAULT_LOCALE", "it")
+locale = System.get_env("DEFAULT_LOCALE") || "it"
+config :gettext, :default_locale, locale
 
 database_url = System.get_env("DATABASE_URL")
 pool_size = String.to_integer(System.get_env("POOL_SIZE") || "10")
@@ -50,3 +51,10 @@ config :event_manager, :openid_connect_providers,
     response_type: "code",
     scope: "openid email profile"
   ]
+
+config :sentry,
+       dsn: System.get_env("SENTRY_DSN"),
+       environment_name: System.get_env("SENTRY_CURRENT_ENV"),
+       enable_source_code_context: true,
+       root_source_code_path: File.cwd!,
+       included_environments: ~w(production staging)

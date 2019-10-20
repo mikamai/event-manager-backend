@@ -44,6 +44,7 @@ defmodule EventManager.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
+      {:sentry, "~> 7.0"},
       {:plug_cowboy, "~> 2.0"},
       {:openid_connect, "~> 0.2"}
     ] ++ dev_deps()

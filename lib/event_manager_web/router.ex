@@ -2,6 +2,8 @@ defmodule EventManagerWeb.Router do
   use EventManagerWeb, :router
 
   pipeline :graphql do
+    use Plug.ErrorHandler
+    use Sentry.Plug
     plug :accepts, ["json"]
     plug EventManagerWeb.Context
   end
