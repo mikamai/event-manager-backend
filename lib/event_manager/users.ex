@@ -139,22 +139,14 @@ defmodule EventManager.Users do
       iex> from_claims(claims)
       %{id: claims["sub"], ...}
   """
-  def from_claims(%{
-        "sub" => id,
-        "email" => email,
-        "name" => name,
-        "given_name" => first_name,
-        "family_name" => last_name,
-        "preferred_username" => username,
-        "locale" => locale
-      }),
+  def from_claims(claims),
       do: %{
-        id: id,
-        email: email,
-        name: name,
-        first_name: first_name,
-        last_name: last_name,
-        username: username,
-        locale: locale
+        id: claims["sub"],
+        email: claims["email"],
+        name: claims["name"],
+        first_name: claims["given_name"],
+        last_name: claims["family_name"],
+        username: claims["preferred_username"],
+        locale: claims["locale"]
       }
 end

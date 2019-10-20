@@ -95,6 +95,17 @@ defmodule EventManager.UsersTest do
       assert locale == claims["locale"]
     end
 
+    test "from_claims/1 doesn't break when given bad params" do
+      claims = %{
+        "email" => "email@example.com",
+        "test" => "test",
+      }
+
+      assert %{
+               email: email,
+             } = Users.from_claims(claims)
+    end
+
     test "get_created_event/2 returns a specific event created by the user" do
       user = user_fixture()
 
