@@ -99,7 +99,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Create Sentry release
-        runs: |
+        run: |
           sentry-cli releases new $RELEASE_TAG
           sentry-cli releases set-commits $RELEASE_TAG --auto
           sentry-cli releases deploys $RELEASE_TAG new -e staging
