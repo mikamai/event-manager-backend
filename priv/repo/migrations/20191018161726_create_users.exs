@@ -9,7 +9,7 @@ defmodule EventManager.Repo.Migrations.CreateUsers do
       add :username, :string, null: false
       add :first_name, :string, null: false
       add :last_name, :string, null: false
-      add :locale, :string, null: false, default: Application.get_env(:gettext, :default_locale)
+      add :locale, :string, null: false, default: Application.get_env(:gettext, :default_locale, "it")
 
       timestamps()
     end
