@@ -58,5 +58,12 @@ spec:
                 name: backend-secrets
             - secretRef:
                 name: db-secrets
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+            limits:
+              cpu: 300m
+              memory: 300Mi
           command: ["bin/event_manager"]
           args: ["eval", "EventManager.Release.migrate"]
