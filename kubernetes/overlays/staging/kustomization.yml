@@ -17,4 +17,4 @@ configMapGenerator:
     literals:
       - MIX_ENV=production
       - SENTRY_CURRENT_ENV=staging
-      - DEFAULT_LANGUAGE=it
+      - DEFAULT_LOCALE=it
