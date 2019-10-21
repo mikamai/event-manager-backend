@@ -1,9 +1,6 @@
-## How to contribute to Mikamai Event Manager
+# How to contribute to Mikamai Event Manager
 
-#### **Did you find a bug?**
-
-* **Do not open up a GitHub issue if the bug is a security vulnerability
-  in Rails**, and instead to refer to our [security policy](https://rubyonrails.org/security/).
+## **Did you find a bug?**
 
 * **Ensure the bug was not already reported** by searching on GitHub under [Issues](https://github.com/mikamai/event-manager-backend/issues).
 
@@ -11,7 +8,7 @@
 
 * If possible, use the relevant bug report templates to create the issue.
 
-#### **Did you write a patch that fixes a bug?**
+## **Did you write a patch that fixes a bug?**
 
 * Open a new GitHub pull request with the patch.
 
@@ -19,13 +16,13 @@
 
 * PRs must pass all quality checks and have been reviewed by at least one maintainer to be approved.
 
-#### **Do you intend to add a new feature or change an existing one?**
+## **Do you intend to add a new feature or change an existing one?**
 
 * Suggest your change in a [new issue](https://github.com/mikamai/event-manager-backend/issues/new), using the appropriate template, and start writing code.
 
 * Open a PR when you are ready. However we suggest waiting for positive feedback on the issue as it will greatly increase the chances of the change being accepted.
 
-#### **Do you have questions about the source code?**
+## **Do you have questions about the source code?**
 
 * We're still setting up public communication channels, stay tuned.
 

@@ -140,13 +140,13 @@ defmodule EventManager.Users do
       %{id: claims["sub"], ...}
   """
   def from_claims(claims),
-      do: %{
-        id: claims["sub"],
-        email: claims["email"],
-        name: claims["name"],
-        first_name: claims["given_name"],
-        last_name: claims["family_name"],
-        username: claims["preferred_username"],
-        locale: claims["locale"]
-      }
+    do: %{
+      id: claims["sub"],
+      email: claims["email"],
+      name: claims["name"],
+      first_name: claims["given_name"],
+      last_name: claims["family_name"],
+      username: claims["preferred_username"],
+      locale: claims["locale"]
+    }
 end

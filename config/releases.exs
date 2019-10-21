@@ -53,8 +53,8 @@ config :event_manager, :openid_connect_providers,
   ]
 
 config :sentry,
-       dsn: System.get_env("SENTRY_DSN"),
-       environment_name: System.get_env("SENTRY_CURRENT_ENV"),
-       enable_source_code_context: true,
-       root_source_code_path: File.cwd!,
-       included_environments: ~w(production staging)
+  dsn: System.get_env("SENTRY_DSN"),
+  environment_name: System.get_env("SENTRY_CURRENT_ENV"),
+  enable_source_code_context: true,
+  root_source_code_path: File.cwd!(),
+  included_environments: ~w(production staging)

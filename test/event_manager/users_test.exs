@@ -98,11 +98,11 @@ defmodule EventManager.UsersTest do
     test "from_claims/1 doesn't break when given bad params" do
       claims = %{
         "email" => "email@example.com",
-        "test" => "test",
+        "test" => "test"
       }
 
       assert %{
-               email: email,
+               email: email
              } = Users.from_claims(claims)
     end
 
