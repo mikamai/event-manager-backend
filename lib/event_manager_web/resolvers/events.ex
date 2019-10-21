@@ -115,7 +115,7 @@ defmodule EventManagerWeb.Resolvers.Events do
        dgettext("errors", "only drafted events can be deleted. Current status: %{status}",
          status: status
        )}
-  
+
   defp do_publish(%Events.Event{status: :draft} = event) do
     case Events.update_event(event, %{status: :published}) do
       {:ok, published} -> {:ok, published}
