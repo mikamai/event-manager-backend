@@ -16,7 +16,6 @@ defmodule EventManagerWeb.Resolvers.Events do
     do_get_event(params, &Events.get_event/1)
   end
 
-
   def events(%{last: _last, first: _first} = args, _info), do: {:error, dgettext("errors", "either first or last can be passed, not both")}
   def events(%{before: _before, after: _after} = args, _info), do: {:error, dgettext("errors", "either before or after can be passed, not both")}
   def events(%{last: last} = args, _info), do: do_list_events(args)
