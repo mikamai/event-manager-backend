@@ -13,13 +13,13 @@ defmodule EventManager.EventsTest do
       public: true,
       status: :draft,
       start_time:
-        NaiveDateTime.utc_now()
-        |> NaiveDateTime.truncate(:second)
-        |> NaiveDateTime.to_iso8601(),
+        DateTime.utc_now()
+        |> DateTime.truncate(:second)
+        |> DateTime.to_iso8601(),
       end_time:
-        NaiveDateTime.utc_now()
-        |> NaiveDateTime.truncate(:second)
-        |> NaiveDateTime.to_iso8601()
+        DateTime.utc_now()
+        |> DateTime.truncate(:second)
+        |> DateTime.to_iso8601()
     }
 
     @update_attrs %{
