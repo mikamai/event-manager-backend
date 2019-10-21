@@ -17,9 +17,8 @@ defmodule EventManagerWeb.Resolvers.Events do
   end
 
   def events(args, _info) do
-    with {:ok, offset, limit} <- Connection.offset_and_limit_for_query(args, max: @max_per_page) do
-      Events.list_events(limit, offset) |> Connection.from_slice(offset)
-    else
+    case Connection.offset_and_limit_for_query(args, max: @max_per_page) do
+      {:ok, offset, limit} -> Events.list_events(limit, offset) |> Connection.from_slice(offset)
       {:error, error} -> {:error, Gettext.dgettext(EventManagerWeb.Gettext, "errors", error)}
     end
   end
