@@ -7,7 +7,7 @@ defmodule EventManager.Events.Event do
   import Ecto.Changeset
   import EctoEnum
 
-  defenum(StatusEnum, ["draft", "published", "ended", "cancelled"])
+  defenum(StatusEnum, ["draft", "published", "ended", "cancelled", "participations_closed"])
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

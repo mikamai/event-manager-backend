@@ -37,5 +37,19 @@ defmodule EventManagerWeb.Schema.Events do
 
       resolve(&Events.delete_event/2)
     end
+
+    @desc "Publish an event"
+    field :event_publish, :event do
+      arg(:id, non_null(:id))
+
+      resolve(&Events.publish_event/2)
+    end
+
+    @desc "Cancel an event"
+    field :event_cancel, :event do
+      arg(:id, non_null(:id))
+
+      resolve(&Events.cancel_event/2)
+    end
   end
 end

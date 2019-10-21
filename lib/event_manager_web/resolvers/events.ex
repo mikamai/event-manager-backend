@@ -68,6 +68,40 @@ defmodule EventManagerWeb.Resolvers.Events do
     {:ok, creator}
   end
 
+  @spec publish_event(
+          %{event: :invalid | %{optional(:__struct__) => none, optional(atom | binary) => any}},
+          any
+        ) :: {:error, any} | {:ok, any}
+  def publish_event(_args, %{context: %{current_user: nil}}) do
+    {:error, dgettext("errors", "unauthorized")}
+  end
+
+  def publish_event(params, %{context: %{current_user: current_user}}) do
+    with {:ok, event} <- do_get_event(params, &Users.get_created_event(current_user, &1)),
+         {:ok, published} <- do_publish(event) do
+      {:ok, published}
+    else
+      {:error, errors} -> {:error, errors}
+    end
+  end
+
+  @spec cancel_event(
+          %{event: :invalid | %{optional(:__struct__) => none, optional(atom | binary) => any}},
+          any
+        ) :: {:error, any} | {:ok, any}
+  def cancel_event(_args, %{context: %{current_user: nil}}) do
+    {:error, dgettext("errors", "unauthorized")}
+  end
+
+  def cancel_event(params, %{context: %{current_user: current_user}}) do
+    with {:ok, event} <- do_get_event(params, &Users.get_created_event(current_user, &1)),
+         {:ok, cancelled} <- do_cancel(event) do
+      {:ok, cancelled}
+    else
+      {:error, errors} -> {:error, errors}
+    end
+  end
+
   defp do_delete(%Events.Event{status: :draft} = event) do
     case Events.delete_event(event) do
       {:ok, deleted} -> {:ok, deleted}
@@ -79,6 +113,34 @@ defmodule EventManagerWeb.Resolvers.Events do
     do:
       {:error,
        dgettext("errors", "only drafted events can be deleted. Current status: %{status}",
+         status: status
+       )}
+  
+  defp do_publish(%Events.Event{status: :draft} = event) do
+    case Events.update_event(event, %{status: :published}) do
+      {:ok, published} -> {:ok, published}
+      {:error, changeset} -> {:error, changeset.errors}
+    end
+  end
+
+  defp do_publish(%Events.Event{status: status}),
+    do:
+      {:error,
+       dgettext("errors", "only drafted events can be published. Current status: %{status}",
+         status: status
+       )}
+
+  defp do_cancel(%Events.Event{status: :published} = event) do
+    case Events.update_event(event, %{status: :cancelled}) do
+      {:ok, cancelled} -> {:ok, cancelled}
+      {:error, changeset} -> {:error, changeset.errors}
+    end
+  end
+
+  defp do_cancel(%Events.Event{status: status}),
+    do:
+      {:error,
+       dgettext("errors", "only published events can be cancelled. Current status: %{status}",
          status: status
        )}
 
