@@ -1,6 +1,6 @@
 # Mikamai Event Manager
 
-Mikamai's event management system, used by us as well as many communities around the world to gather and meet up. Publicly available at meetable.it.
+Mikamai's event management system, used by us as well as many communities around the world to gather and meet up. Publicly available at https://meetable.it.
 
 ## Design
 
@@ -8,7 +8,7 @@ Event Manager is a [Phoenix](http://www.phoenixframework.org/) application that 
 
 Authentication and Authorization rely on two [OAuth 2.0](https://auth0.com/docs/protocols/oauth2) protocols, [OpenID Connect 1.0](https://auth0.com/docs/protocols/oidc) and [User-Managed Access 2.0](https://wso2.com/library/article/2018/12/a-quick-guide-to-user-managed-access-2-0/). OpenID is used for authenticating users and give them access to their own events and participations through OAuth 2.0 scopes, while UMA 2 is used to manage sharing permission over a group of users (for example, multiple organizers managing a group).
 
-Any compatible provider should work, but the public instance for Meetable uses [Keycloak](https://keycloak.org/), so this is what it is most tested against.
+Any compatible provider should work, but the public instance for Meetable uses [Keycloak](https://www.keycloak.org/), so this is what it is most tested against.
 
 ## Quickstart
 
