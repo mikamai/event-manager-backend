@@ -10,11 +10,20 @@ defmodule EventManagerWeb.Resolvers.Events do
 
   import EventManagerWeb.Gettext
 
+  @items_per_page Application.get_env(:event_manager, :pagination, []) |> Keyword.get(:items_per_page, 10)
+
   def get_event(params, _info) do
     do_get_event(params, &Events.get_event/1)
   end
 
-  def events(pagination_args, _info) do
+
+  def events(%{last: _last, first: _first} = args, _info), do: {:error, dgettext("errors", "either first or last can be passed, not both")}
+  def events(%{before: _before, after: _after} = args, _info), do: {:error, dgettext("errors", "either before or after can be passed, not both")}
+  def events(%{last: last} = args, _info), do: do_list_events(args)
+  def events(%{first: first} = args, _info), do: do_list_events(args)
+  def events(args, _info), do: Map.put(args, :first, @items_per_page) |> do_list_events()
+
+  defp do_list_events(pagination_args) do
     {:ok, _direction, limit} = Connection.limit(pagination_args)
     {:ok, offset} = Connection.offset(pagination_args)
 
