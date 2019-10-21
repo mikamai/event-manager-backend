@@ -97,38 +97,32 @@ msgid "must be equal to %{number}"
 msgstr ""
 
 #, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:100
+#: lib/event_manager_web/resolvers/events.ex:95
 msgid "event not found by id %{id}"
 msgstr ""
 
 #, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:37
-#: lib/event_manager_web/resolvers/events.ex:59
+#: lib/event_manager_web/resolvers/events.ex:32
+#: lib/event_manager_web/resolvers/events.ex:54
 msgid "unauthorized"
 msgstr ""
 
 #, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:86
+#: lib/event_manager_web/resolvers/events.ex:81
 msgid "only drafted events can be deleted. Current status: %{status}"
 msgstr ""
 
-#, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:21
-msgid "`after` can only be paired with `first`"
-msgstr ""
-
-#, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:20
-msgid "`before` can only be paired with `last`"
-msgstr ""
-
 # Relay Connection errors
-
 msgid "You must either supply `:first` or `:last`"
-msgstr ""
+msgstr "You must either supply `first` or `last`"
 
 msgid "Invalid cursor provided as `after` argument"
 msgstr ""
 
 msgid "Invalid cursor provided as `before` argument"
+msgstr ""
+
+#, elixir-format
+#: lib/event_manager_web/resolvers/events.ex:22
+msgid "`last` cannot be used without `before`"
 msgstr ""

@@ -19,6 +19,7 @@ defmodule EventManagerWeb.Resolvers.Events do
   def events(args, _info) do
     case Connection.offset_and_limit_for_query(args, max: @max_per_page) do
       {:ok, offset, limit} -> Events.list_events(limit, offset) |> Connection.from_slice(offset)
+      {:error, "You must supply a count (total number of records) option if using `last` without `before`"} -> {:error, dgettext("errors", "`last` cannot be used without `before`")}
       {:error, error} -> {:error, Gettext.dgettext(EventManagerWeb.Gettext, "errors", error)}
     end
   end
