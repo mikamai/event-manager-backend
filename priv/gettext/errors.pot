@@ -94,27 +94,32 @@ msgid "must be equal to %{number}"
 msgstr ""
 
 #, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:102
+#: lib/event_manager_web/resolvers/events.ex:100
 msgid "event not found by id %{id}"
 msgstr ""
 
 #, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:39
-#: lib/event_manager_web/resolvers/events.ex:61
+#: lib/event_manager_web/resolvers/events.ex:37
+#: lib/event_manager_web/resolvers/events.ex:59
 msgid "unauthorized"
 msgstr ""
 
 #, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:88
+#: lib/event_manager_web/resolvers/events.ex:86
 msgid "only drafted events can be deleted. Current status: %{status}"
 msgstr ""
 
 #, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:20
-msgid "either first or last can be passed, not both"
+#: lib/event_manager_web/resolvers/events.ex:21
+msgid "`after` can only be paired with `first`"
 msgstr ""
 
 #, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:21
-msgid "either before or after can be passed, not both"
+#: lib/event_manager_web/resolvers/events.ex:20
+msgid "`before` can only be paired with `last`"
+msgstr ""
+
+#, elixir-format
+#: lib/event_manager_web/resolvers/events.ex:24
+msgid "unexpected pagination arguments: %{args}"
 msgstr ""

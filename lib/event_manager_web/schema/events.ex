@@ -8,7 +8,7 @@ defmodule EventManagerWeb.Schema.Events do
   use Absinthe.Relay.Schema, :modern
 
   alias EventManagerWeb.Resolvers.Events
-
+  Absinthe.Relay.Connection.Notation
   import_types(EventManagerWeb.Types.Event)
 
   object :event_queries do

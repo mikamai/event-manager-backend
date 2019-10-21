@@ -97,27 +97,32 @@ msgid "must be equal to %{number}"
 msgstr "deve essere uguale a %{number}"
 
 #, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:102
+#: lib/event_manager_web/resolvers/events.ex:100
 msgid "event not found by id %{id}"
 msgstr "evento non trovato con id %{id}"
 
 #, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:39
-#: lib/event_manager_web/resolvers/events.ex:61
+#: lib/event_manager_web/resolvers/events.ex:37
+#: lib/event_manager_web/resolvers/events.ex:59
 msgid "unauthorized"
 msgstr "non autorizzato"
 
 #, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:88
+#: lib/event_manager_web/resolvers/events.ex:86
 msgid "only drafted events can be deleted. Current status: %{status}"
 msgstr "solamente eventi in bozza possono essere cancellati. Status attuale: %{status}"
 
 #, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:20
-msgid "either first or last can be passed, not both"
-msgstr "solo uno tra first e last può essere passato alla volta"
-
-#, elixir-format, fuzzy
 #: lib/event_manager_web/resolvers/events.ex:21
-msgid "either before or after can be passed, not both"
-msgstr "solo uno tra before e after può essere passato alla volta"
+msgid "`after` can only be paired with `first`"
+msgstr "`after` può essere solo accoppiato con `first`"
+
+#, elixir-format
+#: lib/event_manager_web/resolvers/events.ex:20
+msgid "`before` can only be paired with `last`"
+msgstr "`before` può essere solo accoppiato con `last`"
+
+#, elixir-format
+#: lib/event_manager_web/resolvers/events.ex:24
+msgid "unexpected pagination arguments: %{args}"
+msgstr "parametri di paginazione non validi: %{args}"
