@@ -21,7 +21,7 @@ defmodule EventManagerWeb.Resolvers.Events do
   def events(%{after: _before, last: _last} = args, _info), do: {:error, dgettext("errors", "`after` can only be paired with `first`")}
   def events(%{before: _before} = args, info), do: Map.put_new(args, :last, @items_per_page) |> do_events()
   def events(%{after: _after} = args, info), do: Map.put_new(args, :first, @items_per_page) |> do_events()
-  def events(args, _info), do: {:error, dgettext("errors", "unexpected pagination arguments: %{args}", args: args)}
+  def events(args, _info), do: Map.put_new(args, :first, @items_per_page) |> do_events()
 
   defp do_events(args) do
     {:ok, offset, limit} = Connection.offset_and_limit_for_query(args, max: @items_per_page)

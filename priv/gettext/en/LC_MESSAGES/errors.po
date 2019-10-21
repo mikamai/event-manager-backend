@@ -121,8 +121,3 @@ msgstr ""
 #: lib/event_manager_web/resolvers/events.ex:20
 msgid "`before` can only be paired with `last`"
 msgstr ""
-
-#, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:24
-msgid "unexpected pagination arguments: %{args}"
-msgstr ""

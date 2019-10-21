@@ -121,8 +121,3 @@ msgstr "`after` può essere solo accoppiato con `first`"
 #: lib/event_manager_web/resolvers/events.ex:20
 msgid "`before` can only be paired with `last`"
 msgstr "`before` può essere solo accoppiato con `last`"
-
-#, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:24
-msgid "unexpected pagination arguments: %{args}"
-msgstr "parametri di paginazione non validi: %{args}"
