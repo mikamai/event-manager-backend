@@ -121,3 +121,14 @@ msgstr ""
 #: lib/event_manager_web/resolvers/events.ex:20
 msgid "`before` can only be paired with `last`"
 msgstr ""
+
+# Relay Connection errors
+
+msgid "You must either supply `:first` or `:last`"
+msgstr ""
+
+msgid "Invalid cursor provided as `after` argument"
+msgstr ""
+
+msgid "Invalid cursor provided as `before` argument"
+msgstr ""

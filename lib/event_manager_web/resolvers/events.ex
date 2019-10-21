@@ -10,23 +10,18 @@ defmodule EventManagerWeb.Resolvers.Events do
 
   import EventManagerWeb.Gettext
 
-  @items_per_page Application.get_env(:event_manager, :pagination, []) |> Keyword.get(:items_per_page, 25)
   @max_per_page Application.get_env(:event_manager, :pagination, []) |> Keyword.get(:max_per_page, 50)
 
   def get_event(params, _info) do
     do_get_event(params, &Events.get_event/1)
   end
 
-  def events(%{before: _before, first: _first} = args, _info), do: {:error, dgettext("errors", "`before` can only be paired with `last`")}
-  def events(%{after: _before, last: _last} = args, _info), do: {:error, dgettext("errors", "`after` can only be paired with `first`")}
-  def events(%{before: _before} = args, info), do: Map.put_new(args, :last, @items_per_page) |> do_events()
-  def events(%{after: _after} = args, info), do: Map.put_new(args, :first, @items_per_page) |> do_events()
-  def events(args, _info), do: Map.put_new(args, :first, @items_per_page) |> do_events()
-
-  defp do_events(args) do
-    {:ok, offset, limit} = Connection.offset_and_limit_for_query(args, max: @items_per_page)
-    Events.list_events(limit, offset)
-    |> Connection.from_slice(offset)
+  def events(args, _info) do
+    with {:ok, offset, limit} <- Connection.offset_and_limit_for_query(args, max: @max_per_page) do
+      Events.list_events(limit, offset) |> Connection.from_slice(offset)
+    else
+      {:error, error} -> {:error, Gettext.dgettext(EventManagerWeb.Gettext, "errors", error)}
+    end
   end
 
   @spec create_event(

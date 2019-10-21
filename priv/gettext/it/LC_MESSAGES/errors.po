@@ -121,3 +121,14 @@ msgstr "`after` può essere solo accoppiato con `first`"
 #: lib/event_manager_web/resolvers/events.ex:20
 msgid "`before` can only be paired with `last`"
 msgstr "`before` può essere solo accoppiato con `last`"
+
+# Relay Connection errors
+
+msgid "You must either supply `:first` or `:last`"
+msgstr "Fornire uno tra `:first` o `:last`"
+
+msgid "Invalid cursor provided as `after` argument"
+msgstr "Cursore non valido fornito come parametro `after`"
+
+msgid "Invalid cursor provided as `before` argument"
+msgstr "Cursore non valido fornito come parametro `before`"
