@@ -97,18 +97,20 @@ msgid "must be equal to %{number}"
 msgstr "deve essere uguale a %{number}"
 
 #, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:95
+#: lib/event_manager_web/resolvers/events.ex:157
 msgid "event not found by id %{id}"
 msgstr "evento non trovato con id %{id}"
 
 #, elixir-format
 #: lib/event_manager_web/resolvers/events.ex:32
 #: lib/event_manager_web/resolvers/events.ex:54
+#: lib/event_manager_web/resolvers/events.ex:76
+#: lib/event_manager_web/resolvers/events.ex:93
 msgid "unauthorized"
 msgstr "non autorizzato"
 
 #, elixir-format
-#: lib/event_manager_web/resolvers/events.ex:81
+#: lib/event_manager_web/resolvers/events.ex:115
 msgid "only drafted events can be deleted. Current status: %{status}"
 msgstr "solamente eventi in bozza possono essere cancellati. Status attuale: %{status}"
 
@@ -126,3 +128,13 @@ msgstr "Cursore non valido fornito come parametro `before`"
 #: lib/event_manager_web/resolvers/events.ex:22
 msgid "`last` cannot be used without `before`"
 msgstr "`last` non può essere usato senza `before`"
+
+#, elixir-format
+#: lib/event_manager_web/resolvers/events.ex:129
+msgid "only drafted events can be published. Current status: %{status}"
+msgstr "solo gli eventi in bozza possono essere cancellati. Status attuale: %{status}"
+
+#, elixir-format
+#: lib/event_manager_web/resolvers/events.ex:143
+msgid "only published events can be cancelled. Current status: %{status}"
+msgstr "solo gli eventi in bozza possono essere cancellati. Status attuale: %{status}"
