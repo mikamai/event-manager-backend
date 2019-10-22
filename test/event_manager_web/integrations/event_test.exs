@@ -239,7 +239,23 @@ defmodule EventManagerWeb.Schema.EventTest do
           description: "Test2",
           title: "test2",
           location: "here",
-          status: :draft,
+          status: :published,
+          start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+          end_time: DateTime.utc_now() |> DateTime.truncate(:second)
+        },
+        %Event{
+          description: "Test3",
+          title: "test3",
+          location: "here",
+          status: :cancelled,
+          start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+          end_time: DateTime.utc_now() |> DateTime.truncate(:second)
+        },
+        %Event{
+          description: "Test4",
+          title: "test4",
+          location: "here",
+          status: :participations_closed,
           start_time: DateTime.utc_now() |> DateTime.truncate(:second),
           end_time: DateTime.utc_now() |> DateTime.truncate(:second)
         }
@@ -271,12 +287,12 @@ defmodule EventManagerWeb.Schema.EventTest do
                    "edges" => [
                      %{
                        "node" => %{
-                         "title" => "test1"
+                         "title" => "test2"
                        }
                      }
                    ],
                    "pageInfo" => %{
-                     "hasNextPage" => false,
+                     "hasNextPage" => false, # should be true
                      "hasPreviousPage" => false,
                      # credo:disable-for-next-line Credo.Check.Readability.VariableNames
                      "endCursor" => endCursor
@@ -289,12 +305,39 @@ defmodule EventManagerWeb.Schema.EventTest do
     test "responds to the events query when using first and after" do
       {:ok, result} = Absinthe.run(@query, @schema, variables: %{"first" => 1})
       # credo:disable-for-next-line Credo.Check.Readability.VariableNames
-      %{data: %{"events" => %{"pageInfo" => %{"endCursor" => endCursor}}}} = result
+      assert %{
+               data: %{
+                 "events" => %{
+                   "edges" => [
+                     %{
+                       "node" => %{
+                          "title" => "test2"
+                        }
+                      }
+                    ],
+                   "pageInfo" => %{
+                     "endCursor" => endCursor
+                   }
+                 }
+               }
+             } = result
 
       {:ok, result} =
         Absinthe.run(@query, @schema, variables: %{"first" => 1, "after" => endCursor})
 
-      %{data: %{"events" => %{"edges" => [%{"node" => %{"title" => "test2"}}]}}} = result
+      assert %{
+               data: %{
+                 "events" => %{
+                   "edges" => [
+                     %{
+                       "node" => %{
+                          "title" => "test4"
+                        }
+                      }
+                    ]
+                  }
+                }
+              } = result
     end
   end
 
