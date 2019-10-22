@@ -312,7 +312,6 @@ defmodule EventManagerWeb.Schema.EventTest do
         description: "Test",
         title: "test",
         location: "here",
-        public: true,
         status: :draft,
         start_time: DateTime.utc_now() |> DateTime.truncate(:second),
         end_time: DateTime.utc_now() |> DateTime.truncate(:second)
@@ -332,7 +331,6 @@ defmodule EventManagerWeb.Schema.EventTest do
                    "description" => description,
                    "endTime" => end_time,
                    "location" => location,
-                   "public" => public,
                    "startTime" => start_time,
                    "status" => "PUBLISHED",
                    "title" => title
@@ -343,7 +341,6 @@ defmodule EventManagerWeb.Schema.EventTest do
       assert title == event.title
       assert description == event.description
       assert location == event.location
-      assert public == event.public
       assert end_time == event.end_time |> DateTime.to_iso8601()
       assert start_time == event.start_time |> DateTime.to_iso8601()
     end
@@ -355,7 +352,6 @@ defmodule EventManagerWeb.Schema.EventTest do
         description: "Test",
         title: "test",
         location: "here",
-        public: true,
         status: :ended,
         start_time: DateTime.utc_now() |> DateTime.truncate(:second),
         end_time: DateTime.utc_now() |> DateTime.truncate(:second)
@@ -416,7 +412,6 @@ defmodule EventManagerWeb.Schema.EventTest do
         description: "Test",
         title: "test",
         location: "here",
-        public: true,
         status: :published,
         start_time: DateTime.utc_now() |> DateTime.truncate(:second),
         end_time: DateTime.utc_now() |> DateTime.truncate(:second)
@@ -436,7 +431,6 @@ defmodule EventManagerWeb.Schema.EventTest do
                    "description" => description,
                    "endTime" => end_time,
                    "location" => location,
-                   "public" => public,
                    "startTime" => start_time,
                    "status" => "CANCELLED",
                    "title" => title
@@ -447,7 +441,6 @@ defmodule EventManagerWeb.Schema.EventTest do
       assert title == event.title
       assert description == event.description
       assert location == event.location
-      assert public == event.public
       assert end_time == event.end_time |> DateTime.to_iso8601()
       assert start_time == event.start_time |> DateTime.to_iso8601()
     end
@@ -459,7 +452,6 @@ defmodule EventManagerWeb.Schema.EventTest do
         description: "Test",
         title: "test",
         location: "here",
-        public: true,
         status: :ended,
         start_time: DateTime.utc_now() |> DateTime.truncate(:second),
         end_time: DateTime.utc_now() |> DateTime.truncate(:second)
