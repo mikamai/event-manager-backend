@@ -310,4 +310,212 @@ defmodule EventManagerWeb.Schema.EventTest do
       %{data: %{"events" => %{"edges" => [%{"node" => %{"title" => "test2"}}]}}} = result
     end
   end
+
+  describe "mutation eventPublish" do
+    @mutation """
+    mutation EventPublish($id: ID!) {
+      eventPublish(id: $id) { #{@event_data} }
+    }
+    """
+
+    test "respond to the publish event mutation" do
+      context = current_user()
+
+      event = %Event{
+        description: "Test",
+        title: "test",
+        location: "here",
+        public: true,
+        status: :draft,
+        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
+      }
+
+      event =
+        EventManager.Events.change_event(event)
+        |> Ecto.Changeset.put_assoc(:creator, context.current_user)
+        |> EventManager.Repo.insert!()
+
+      {:ok, result} =
+        Absinthe.run(@mutation, @schema, variables: %{"id" => event.id}, context: context)
+
+      assert %{
+               data: %{
+                 "eventPublish" => %{
+                   "description" => description,
+                   "endTime" => end_time,
+                   "location" => location,
+                   "public" => public,
+                   "startTime" => start_time,
+                   "status" => "PUBLISHED",
+                   "title" => title
+                 }
+               }
+             } = result
+
+      assert title == event.title
+      assert description == event.description
+      assert location == event.location
+      assert public == event.public
+      assert end_time == event.end_time |> DateTime.to_iso8601()
+      assert start_time == event.start_time |> DateTime.to_iso8601()
+    end
+
+    test "responds invalid status when the event cannot be published" do
+      context = current_user()
+
+      event = %Event{
+        description: "Test",
+        title: "test",
+        location: "here",
+        public: true,
+        status: :ended,
+        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
+      }
+
+      event =
+        EventManager.Events.change_event(event)
+        |> Ecto.Changeset.put_assoc(:creator, context.current_user)
+        |> EventManager.Repo.insert!()
+
+      {:ok, result} =
+        Absinthe.run(@mutation, @schema, variables: %{"id" => event.id}, context: context)
+
+      assert %{
+               data: %{"eventPublish" => nil},
+               errors: [
+                 %{
+                   message: "only drafted events can be published. Current status: ended",
+                   path: ["eventPublish"]
+                 }
+               ]
+             } = result
+    end
+
+    test "responds not found for an nonexistent event" do
+      uuid = "550e8400-e29b-41d4-a716-446655440000"
+
+      {:ok, result} =
+        Absinthe.run(@mutation, @schema, variables: %{"id" => uuid}, context: current_user())
+
+      message = "event not found by id #{uuid}"
+
+      assert %{
+               data: %{"eventPublish" => nil},
+               errors: [
+                 %{
+                   message: error,
+                   path: ["eventPublish"]
+                 }
+               ]
+             } = result
+
+      assert error == message
+    end
+  end
+
+  describe "mutation eventCancel" do
+    @mutation """
+    mutation EventCancel($id: ID!) {
+      eventCancel(id: $id) { #{@event_data} }
+    }
+    """
+
+    test "respond to the cancel event mutation" do
+      context = current_user()
+
+      event = %Event{
+        description: "Test",
+        title: "test",
+        location: "here",
+        public: true,
+        status: :published,
+        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
+      }
+
+      event =
+        EventManager.Events.change_event(event)
+        |> Ecto.Changeset.put_assoc(:creator, context.current_user)
+        |> EventManager.Repo.insert!()
+
+      {:ok, result} =
+        Absinthe.run(@mutation, @schema, variables: %{"id" => event.id}, context: context)
+
+      assert %{
+               data: %{
+                 "eventCancel" => %{
+                   "description" => description,
+                   "endTime" => end_time,
+                   "location" => location,
+                   "public" => public,
+                   "startTime" => start_time,
+                   "status" => "CANCELLED",
+                   "title" => title
+                 }
+               }
+             } = result
+
+      assert title == event.title
+      assert description == event.description
+      assert location == event.location
+      assert public == event.public
+      assert end_time == event.end_time |> DateTime.to_iso8601()
+      assert start_time == event.start_time |> DateTime.to_iso8601()
+    end
+
+    test "responds invalid status when the event cannot be cancelled" do
+      context = current_user()
+
+      event = %Event{
+        description: "Test",
+        title: "test",
+        location: "here",
+        public: true,
+        status: :ended,
+        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
+      }
+
+      event =
+        EventManager.Events.change_event(event)
+        |> Ecto.Changeset.put_assoc(:creator, context.current_user)
+        |> EventManager.Repo.insert!()
+
+      {:ok, result} =
+        Absinthe.run(@mutation, @schema, variables: %{"id" => event.id}, context: context)
+
+      assert %{
+               data: %{"eventCancel" => nil},
+               errors: [
+                 %{
+                   message: "only published events can be cancelled. Current status: ended",
+                   path: ["eventCancel"]
+                 }
+               ]
+             } = result
+    end
+
+    test "responds not found for an nonexistent event" do
+      uuid = "550e8400-e29b-41d4-a716-446655440000"
+
+      {:ok, result} =
+        Absinthe.run(@mutation, @schema, variables: %{"id" => uuid}, context: current_user())
+
+      message = "event not found by id #{uuid}"
+
+      assert %{
+               data: %{"eventCancel" => nil},
+               errors: [
+                 %{
+                   message: error,
+                   path: ["eventCancel"]
+                 }
+               ]
+             } = result
+
+      assert error == message
+    end
+  end
 end
