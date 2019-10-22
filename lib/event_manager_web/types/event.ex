@@ -11,7 +11,7 @@ defmodule EventManagerWeb.Types.Event do
     field(:title, non_null(:string))
     field(:description, non_null(:string))
     field(:location, non_null(:string))
-    field(:public, :boolean, default_value: false)
+    # field(:public, :boolean, default_value: false)
     field(:start_time, non_null(:datetime))
     field(:end_time, non_null(:datetime))
   end
@@ -29,7 +29,7 @@ defmodule EventManagerWeb.Types.Event do
     field(:title, non_null(:string))
     field(:description, non_null(:string))
     field(:location, non_null(:string))
-    field(:public, non_null(:boolean))
+    # field(:public, non_null(:boolean))
     field(:status, non_null(:event_state))
     field(:start_time, non_null(:datetime))
     field(:end_time, non_null(:datetime))
