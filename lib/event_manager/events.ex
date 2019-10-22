@@ -30,18 +30,56 @@ defmodule EventManager.Events do
   end
 
   @doc """
+  Returns a list of only published events.
+
+  ## Examples
+
+      iex> list_published_events()
+      [%Event{}, ...]
+
+  """
+  def list_published_events do
+    Event
+    |> do_where_published()
+    |> Repo.all()
+  end
+
+  @doc """
   Returns the paginated list of events.
 
   ## Examples
 
       iex> list_events(10, 1)
       [%Event{}, ...]
+
   """
   def list_events(limit, offset) do
     Event
     |> limit(^limit)
     |> offset(^offset)
     |> Repo.all()
+  end
+
+  @doc """
+  Returns a list of only published events.
+
+  ## Examples
+
+      iex> list_published_events(10, 1)
+      [%Event{}, ...]
+
+  """
+  def list_published_events(limit, offset) do
+    Event
+    |> do_where_published()
+    |> limit(^limit)
+    |> offset(^offset)
+    |> Repo.all()
+  end
+
+  defp do_where_published(queryable) do
+    queryable
+    |> where([q], q.status in ["published", "participations_closed"])
   end
 
   @doc """
