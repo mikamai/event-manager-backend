@@ -65,44 +65,62 @@ defmodule EventManagerWeb.Schema.EventTest do
   end
 
   describe "query event" do
+    defp events_by_statuses(statuses) do
+      Enum.map(statuses, fn status -> %Event{
+        description: "Test #{status}",
+        title: "test #{status}",
+        location: "here",
+        status: status,
+        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
+      } end)
+      |> Enum.map(&Event.changeset/1)
+      |> Enum.map(&EventManager.Repo.insert!/1)
+    end
+
     @query """
     query Event($id: ID!) {
       event(id: $id) { #{@event_data} }
     }
     """
 
-    test "responds to the event query" do
-      event = %Event{
-        description: "Test",
-        title: "test",
-        location: "here",
-        status: :draft,
-        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
-        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
-      }
+    @statuses [:draft, :published]
 
-      event = EventManager.Repo.insert!(event)
+    test "doesn't find a drafted event" do
+      [draft, _] = events_by_statuses(@statuses)
 
-      {:ok, result} = Absinthe.run(@query, @schema, variables: %{"id" => event.id})
+      {:ok, result} = Absinthe.run(@query, @schema, variables: %{"id" => draft.id})
 
       assert %{
                data: %{
-                 "event" => %{
-                   "description" => description,
-                   "endTime" => end_time,
-                   "location" => location,
-                   "startTime" => start_time,
-                   "status" => "DRAFT",
-                   "title" => title
-                 }
+                 "event" => nil
                }
              } = result
+    end
 
-      assert title == event.title
-      assert description == event.description
-      assert location == event.location
-      assert end_time == event.end_time |> DateTime.to_iso8601()
-      assert start_time == event.start_time |> DateTime.to_iso8601()
+    test "finds a publish event" do
+      [_, published] = events_by_statuses(@statuses)
+
+      {:ok, result} = Absinthe.run(@query, @schema, variables: %{"id" => published.id})
+
+      assert %{
+          data: %{
+            "event" => %{
+              "description" => description,
+              "endTime" => end_time,
+              "location" => location,
+              "startTime" => start_time,
+              "status" => "PUBLISHED",
+              "title" => title
+            }
+          }
+        } = result
+
+      assert title == published.title
+      assert description == published.description
+      assert location == published.location
+      assert end_time == published.end_time |> DateTime.to_iso8601()
+      assert start_time == published.start_time |> DateTime.to_iso8601()
     end
 
     test "responds not found for an nonexistent event" do
