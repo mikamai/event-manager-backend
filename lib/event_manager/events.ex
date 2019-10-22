@@ -108,6 +108,46 @@ defmodule EventManager.Events do
   def get_event(id), do: Repo.get(Event, id)
 
   @doc """
+  Gets a single published event.
+
+  Raises `Ecto.NoResultsError` if it doesn't exist or it isn't published.
+
+  ## Examples
+
+      iex> get_event!(123)
+      %Event{}
+
+      iex> get_event!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_published_event!(id) do
+    Event
+    |> where_published()
+    |> Repo.get!(id)
+  end
+
+  @doc """
+  Gets a single event.
+
+  Returns `nil` if it doesn't exist or it isn't published.
+
+  ## Examples
+
+      iex> get_event(123)
+      %Event{}
+
+      iex> get_event(456)
+      nil
+
+  """
+  def get_published_event(id) do
+    Event
+    |> where_published()
+    |> Repo.get(id)
+  end
+
+  @doc """
   Creates a event.
 
   ## Examples

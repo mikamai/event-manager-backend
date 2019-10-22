@@ -14,7 +14,7 @@ defmodule EventManagerWeb.Resolvers.Events do
                 |> Keyword.get(:max_per_page, 50)
 
   def get_event(params, _info) do
-    do_get_event(params, &Events.get_event/1)
+    do_get_event(params, &Events.get_published_event/1)
   end
 
   def events(args, _info) do
