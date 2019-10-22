@@ -25,9 +25,7 @@ defmodule EventManager.Events do
       [%Event{}, ...]
 
   """
-  def list_events do
-    Repo.all(Event)
-  end
+  def list_events, do: Repo.all(Event)
 
   @doc """
   Returns a list of only published events.
@@ -40,7 +38,7 @@ defmodule EventManager.Events do
   """
   def list_published_events do
     Event
-    |> do_where_published()
+    |> where_published()
     |> Repo.all()
   end
 
@@ -71,15 +69,10 @@ defmodule EventManager.Events do
   """
   def list_published_events(limit, offset) do
     Event
-    |> do_where_published()
+    |> where_published()
     |> limit(^limit)
     |> offset(^offset)
     |> Repo.all()
-  end
-
-  defp do_where_published(queryable) do
-    queryable
-    |> where([q], q.status in ["published", "participations_closed"])
   end
 
   @doc """
@@ -191,5 +184,9 @@ defmodule EventManager.Events do
   def get_event_creator(%Event{} = event) do
     Ecto.assoc(event, :creator)
     |> Repo.one!()
+  end
+
+  defp where_published(queryable) do
+    where(queryable, [q], q.status in ["published", "participations_closed"])
   end
 end
