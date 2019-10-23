@@ -6,13 +6,13 @@ defmodule EventManagerWeb.Schema.EventTest do
   @schema EventManagerWeb.Schema
 
   @event_data """
-    id
-    title
-    description
-    endTime
-    startTime
-    status
-    location
+  id
+  title
+  description
+  endTime
+  startTime
+  status
+  location
   """
 
   def current_user(context \\ %{}),
@@ -44,17 +44,17 @@ defmodule EventManagerWeb.Schema.EventTest do
         Absinthe.run(@mutation, @schema, variables: %{"event" => event}, context: current_user())
 
       assert %{
-        data: %{
-          "eventCreate" => %{
-            "description" => description,
-            "endTime" => end_time,
-            "location" => location,
-            "startTime" => start_time,
-            "status" => "DRAFT",
-            "title" => title
-          }
-        }
-      } = result
+               data: %{
+                 "eventCreate" => %{
+                   "description" => description,
+                   "endTime" => end_time,
+                   "location" => location,
+                   "startTime" => start_time,
+                   "status" => "DRAFT",
+                   "title" => title
+                 }
+               }
+             } = result
 
       assert description == event["description"]
       assert end_time == event["endTime"]
@@ -66,14 +66,17 @@ defmodule EventManagerWeb.Schema.EventTest do
 
   describe "query event" do
     defp events_by_statuses(statuses) do
-      Enum.map(statuses, &(%Event{
+      Enum.map(
+        statuses,
+        &%Event{
           description: "Test #{&1}",
           title: "test #{&1}",
           location: "here",
           status: &1,
           start_time: DateTime.utc_now() |> DateTime.truncate(:second),
           end_time: DateTime.utc_now() |> DateTime.truncate(:second)
-        }))
+        }
+      )
       |> Enum.map(&Event.changeset/1)
       |> Enum.map(&EventManager.Repo.insert!/1)
     end
@@ -100,17 +103,17 @@ defmodule EventManagerWeb.Schema.EventTest do
       {:ok, result} = Absinthe.run(@query, @schema, variables: %{"id" => published.id})
 
       assert %{
-        data: %{
-          "event" => %{
-            "description" => description,
-            "endTime" => end_time,
-            "location" => location,
-            "startTime" => start_time,
-            "status" => "PUBLISHED",
-            "title" => title
-          }
-        }
-      } = result
+               data: %{
+                 "event" => %{
+                   "description" => description,
+                   "endTime" => end_time,
+                   "location" => location,
+                   "startTime" => start_time,
+                   "status" => "PUBLISHED",
+                   "title" => title
+                 }
+               }
+             } = result
 
       assert title == published.title
       assert description == published.description
@@ -134,17 +137,17 @@ defmodule EventManagerWeb.Schema.EventTest do
         Absinthe.run(@query, @schema, variables: %{"id" => participations_closed.id})
 
       assert %{
-        data: %{
-          "event" => %{
-            "description" => description,
-            "endTime" => end_time,
-            "location" => location,
-            "startTime" => start_time,
-            "status" => "PARTICIPATIONS_CLOSED",
-            "title" => title
-          }
-        }
-      } = result
+               data: %{
+                 "event" => %{
+                   "description" => description,
+                   "endTime" => end_time,
+                   "location" => location,
+                   "startTime" => start_time,
+                   "status" => "PARTICIPATIONS_CLOSED",
+                   "title" => title
+                 }
+               }
+             } = result
 
       assert title == participations_closed.title
       assert description == participations_closed.description
@@ -161,14 +164,14 @@ defmodule EventManagerWeb.Schema.EventTest do
       message = "event not found by id #{uuid}"
 
       assert %{
-        data: %{"event" => nil},
-        errors: [
-          %{
-            message: error,
-            path: ["event"]
-          }
-        ]
-      } = result
+               data: %{"event" => nil},
+               errors: [
+                 %{
+                   message: error,
+                   path: ["event"]
+                 }
+               ]
+             } = result
 
       assert error == message
     end
@@ -184,33 +187,34 @@ defmodule EventManagerWeb.Schema.EventTest do
     test "respond to the delete event mutation" do
       context = current_user()
 
-      event = %Event{
-        description: "Test",
-        title: "test",
-        location: "here",
-        status: :draft,
-        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
-        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
-      }
-      |> EventManager.Events.change_event()
-      |> Ecto.Changeset.put_assoc(:creator, context.current_user)
-      |> EventManager.Repo.insert!()
+      event =
+        %Event{
+          description: "Test",
+          title: "test",
+          location: "here",
+          status: :draft,
+          start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+          end_time: DateTime.utc_now() |> DateTime.truncate(:second)
+        }
+        |> EventManager.Events.change_event()
+        |> Ecto.Changeset.put_assoc(:creator, context.current_user)
+        |> EventManager.Repo.insert!()
 
       {:ok, result} =
         Absinthe.run(@mutation, @schema, variables: %{"id" => event.id}, context: context)
 
       assert %{
-        data: %{
-          "eventDelete" => %{
-            "description" => description,
-            "endTime" => end_time,
-            "location" => location,
-            "startTime" => start_time,
-            "status" => "DRAFT",
-            "title" => title
-          }
-        }
-      } = result
+               data: %{
+                 "eventDelete" => %{
+                   "description" => description,
+                   "endTime" => end_time,
+                   "location" => location,
+                   "startTime" => start_time,
+                   "status" => "DRAFT",
+                   "title" => title
+                 }
+               }
+             } = result
 
       assert title == event.title
       assert description == event.description
@@ -222,7 +226,8 @@ defmodule EventManagerWeb.Schema.EventTest do
     test "responds invalid status when the event is not in draft status" do
       context = current_user()
 
-      event = %Event{
+      event =
+        %Event{
           description: "Test",
           title: "test",
           location: "here",
@@ -238,14 +243,14 @@ defmodule EventManagerWeb.Schema.EventTest do
         Absinthe.run(@mutation, @schema, variables: %{"id" => event.id}, context: context)
 
       assert %{
-        data: %{"eventDelete" => nil},
-        errors: [
-          %{
-            message: "only drafted events can be deleted. Current status: published",
-            path: ["eventDelete"]
-          }
-        ]
-      } = result
+               data: %{"eventDelete" => nil},
+               errors: [
+                 %{
+                   message: "only drafted events can be deleted. Current status: published",
+                   path: ["eventDelete"]
+                 }
+               ]
+             } = result
     end
 
     test "responds not found for an nonexistent event" do
@@ -257,14 +262,14 @@ defmodule EventManagerWeb.Schema.EventTest do
       message = "event not found by id #{uuid}"
 
       assert %{
-        data: %{"eventDelete" => nil},
-        errors: [
-          %{
-            message: error,
-            path: ["eventDelete"]
-          }
-        ]
-      } = result
+               data: %{"eventDelete" => nil},
+               errors: [
+                 %{
+                   message: error,
+                   path: ["eventDelete"]
+                 }
+               ]
+             } = result
 
       assert error == message
     end
@@ -272,14 +277,17 @@ defmodule EventManagerWeb.Schema.EventTest do
 
   describe "query events" do
     setup do
-      Enum.map(@statuses, &(%Event{
+      Enum.map(
+        @statuses,
+        &%Event{
           description: "Test #{&1}",
           title: "test #{&1}",
           location: "here",
           status: &1,
           start_time: DateTime.utc_now() |> DateTime.truncate(:second),
           end_time: DateTime.utc_now() |> DateTime.truncate(:second)
-        }))
+        }
+      )
       |> Enum.map(&Event.changeset/1)
       |> Enum.map(&EventManager.Repo.insert/1)
     end
@@ -302,61 +310,62 @@ defmodule EventManagerWeb.Schema.EventTest do
       {:ok, result} = Absinthe.run(@query, @schema, variables: %{"first" => 1})
 
       assert %{
-        data: %{
-          "events" => %{
-            "edges" => [
-              %{
-                "node" => %{
-                  "title" => "test published"
-                }
-              }
-            ],
-            "pageInfo" => %{
-              "hasNextPage" => false, # shouldn't this be true?
-              "hasPreviousPage" => false,
-              "endCursor" => _
-            }
-          }
-        }
-      } = result
+               data: %{
+                 "events" => %{
+                   "edges" => [
+                     %{
+                       "node" => %{
+                         "title" => "test published"
+                       }
+                     }
+                   ],
+                   "pageInfo" => %{
+                     # shouldn't this be true?
+                     "hasNextPage" => false,
+                     "hasPreviousPage" => false,
+                     "endCursor" => _
+                   }
+                 }
+               }
+             } = result
     end
 
     test "responds to the events query when using first and after" do
       {:ok, result} = Absinthe.run(@query, @schema, variables: %{"first" => 1})
 
       assert %{
-        data: %{
-          "events" => %{
-            "edges" => [
-              %{
-                "node" => %{
-                  "title" => "test published"
-                }
-              }
-            ],
-            "pageInfo" => %{
-              "endCursor" => end_cursor
-            }
-          }
-        }
-      } = result
+               data: %{
+                 "events" => %{
+                   "edges" => [
+                     %{
+                       "node" => %{
+                         "title" => "test published"
+                       }
+                     }
+                   ],
+                   "pageInfo" => %{
+                     "endCursor" => end_cursor
+                   }
+                 }
+               }
+             } = result
 
       {:ok, result} =
         Absinthe.run(@query, @schema, variables: %{"first" => 1, "after" => end_cursor})
 
       assert %{
-        data: %{
-          "events" => %{
-            "edges" => [
-              %{
-                "node" => %{
-                  "title" => "test participations_closed"
-                }
-              }
-            ]
-          }
-        }
-      } = result
+               data: %{
+                 "events" => %{
+                   "edges" => [
+                     %{
+                       "node" => %{
+                         "title" => "test participations_closed"
+                       }
+                     }
+                   ]
+                 }
+               }
+             } = result
     end
   end
 
@@ -388,17 +397,17 @@ defmodule EventManagerWeb.Schema.EventTest do
         Absinthe.run(@mutation, @schema, variables: %{"id" => event.id}, context: context)
 
       assert %{
-        data: %{
-          "eventPublish" => %{
-            "description" => description,
-            "endTime" => end_time,
-            "location" => location,
-            "startTime" => start_time,
-            "status" => "PUBLISHED",
-            "title" => title
-          }
-        }
-      } = result
+               data: %{
+                 "eventPublish" => %{
+                   "description" => description,
+                   "endTime" => end_time,
+                   "location" => location,
+                   "startTime" => start_time,
+                   "status" => "PUBLISHED",
+                   "title" => title
+                 }
+               }
+             } = result
 
       assert title == event.title
       assert description == event.description
@@ -410,30 +419,31 @@ defmodule EventManagerWeb.Schema.EventTest do
     test "responds invalid status when the event cannot be published" do
       context = current_user()
 
-      event = %Event{
-        description: "Test",
-        title: "test",
-        location: "here",
-        status: :ended,
-        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
-        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
-      }
-      |> EventManager.Events.change_event()
-      |> Ecto.Changeset.put_assoc(:creator, context.current_user)
-      |> EventManager.Repo.insert!()
+      event =
+        %Event{
+          description: "Test",
+          title: "test",
+          location: "here",
+          status: :ended,
+          start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+          end_time: DateTime.utc_now() |> DateTime.truncate(:second)
+        }
+        |> EventManager.Events.change_event()
+        |> Ecto.Changeset.put_assoc(:creator, context.current_user)
+        |> EventManager.Repo.insert!()
 
       {:ok, result} =
         Absinthe.run(@mutation, @schema, variables: %{"id" => event.id}, context: context)
 
       assert %{
-        data: %{"eventPublish" => nil},
-        errors: [
-          %{
-            message: "only drafted events can be published. Current status: ended",
-            path: ["eventPublish"]
-          }
-        ]
-      } = result
+               data: %{"eventPublish" => nil},
+               errors: [
+                 %{
+                   message: "only drafted events can be published. Current status: ended",
+                   path: ["eventPublish"]
+                 }
+               ]
+             } = result
     end
 
     test "responds not found for an nonexistent event" do
@@ -445,14 +455,14 @@ defmodule EventManagerWeb.Schema.EventTest do
       message = "event not found by id #{uuid}"
 
       assert %{
-        data: %{"eventPublish" => nil},
-        errors: [
-          %{
-            message: error,
-            path: ["eventPublish"]
-          }
-        ]
-      } = result
+               data: %{"eventPublish" => nil},
+               errors: [
+                 %{
+                   message: error,
+                   path: ["eventPublish"]
+                 }
+               ]
+             } = result
 
       assert error == message
     end
@@ -468,33 +478,34 @@ defmodule EventManagerWeb.Schema.EventTest do
     test "respond to the cancel event mutation" do
       context = current_user()
 
-      event = %Event{
-        description: "Test",
-        title: "test",
-        location: "here",
-        status: :published,
-        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
-        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
-      }
-      |> EventManager.Events.change_event()
-      |> Ecto.Changeset.put_assoc(:creator, context.current_user)
-      |> EventManager.Repo.insert!()
+      event =
+        %Event{
+          description: "Test",
+          title: "test",
+          location: "here",
+          status: :published,
+          start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+          end_time: DateTime.utc_now() |> DateTime.truncate(:second)
+        }
+        |> EventManager.Events.change_event()
+        |> Ecto.Changeset.put_assoc(:creator, context.current_user)
+        |> EventManager.Repo.insert!()
 
       {:ok, result} =
         Absinthe.run(@mutation, @schema, variables: %{"id" => event.id}, context: context)
 
       assert %{
-        data: %{
-          "eventCancel" => %{
-            "description" => description,
-            "endTime" => end_time,
-            "location" => location,
-            "startTime" => start_time,
-            "status" => "CANCELLED",
-            "title" => title
-          }
-        }
-      } = result
+               data: %{
+                 "eventCancel" => %{
+                   "description" => description,
+                   "endTime" => end_time,
+                   "location" => location,
+                   "startTime" => start_time,
+                   "status" => "CANCELLED",
+                   "title" => title
+                 }
+               }
+             } = result
 
       assert title == event.title
       assert description == event.description
@@ -506,30 +517,31 @@ defmodule EventManagerWeb.Schema.EventTest do
     test "responds invalid status when the event cannot be cancelled" do
       context = current_user()
 
-      event = %Event{
-        description: "Test",
-        title: "test",
-        location: "here",
-        status: :ended,
-        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
-        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
-      }
-      |> EventManager.Events.change_event()
-      |> Ecto.Changeset.put_assoc(:creator, context.current_user)
-      |> EventManager.Repo.insert!()
+      event =
+        %Event{
+          description: "Test",
+          title: "test",
+          location: "here",
+          status: :ended,
+          start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+          end_time: DateTime.utc_now() |> DateTime.truncate(:second)
+        }
+        |> EventManager.Events.change_event()
+        |> Ecto.Changeset.put_assoc(:creator, context.current_user)
+        |> EventManager.Repo.insert!()
 
       {:ok, result} =
         Absinthe.run(@mutation, @schema, variables: %{"id" => event.id}, context: context)
 
       assert %{
-        data: %{"eventCancel" => nil},
-        errors: [
-          %{
-            message: "only published events can be cancelled. Current status: ended",
-            path: ["eventCancel"]
-          }
-        ]
-      } = result
+               data: %{"eventCancel" => nil},
+               errors: [
+                 %{
+                   message: "only published events can be cancelled. Current status: ended",
+                   path: ["eventCancel"]
+                 }
+               ]
+             } = result
     end
 
     test "responds not found for an nonexistent event" do
@@ -541,14 +553,14 @@ defmodule EventManagerWeb.Schema.EventTest do
       message = "event not found by id #{uuid}"
 
       assert %{
-        data: %{"eventCancel" => nil},
-        errors: [
-          %{
-            message: error,
-            path: ["eventCancel"]
-          }
-        ]
-      } = result
+               data: %{"eventCancel" => nil},
+               errors: [
+                 %{
+                   message: error,
+                   path: ["eventCancel"]
+                 }
+               ]
+             } = result
 
       assert error == message
     end
