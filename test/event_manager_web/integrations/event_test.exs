@@ -79,6 +79,7 @@ defmodule EventManagerWeb.Schema.EventTest do
       )
       |> Enum.map(&Event.changeset/1)
       |> Enum.map(&EventManager.Repo.insert!/1)
+      |> Enum.into(%{}, fn event -> {event.status, event} end)
     end
 
     @query """
@@ -90,7 +91,7 @@ defmodule EventManagerWeb.Schema.EventTest do
     @statuses ~w(draft published cancelled participations_closed)a
 
     test "doesn't find a drafted event" do
-      [draft | _others] = events_by_statuses(@statuses)
+      %{draft: draft} = events_by_statuses(@statuses)
 
       {:ok, result} = Absinthe.run(@query, @schema, variables: %{"id" => draft.id})
 
@@ -98,7 +99,7 @@ defmodule EventManagerWeb.Schema.EventTest do
     end
 
     test "finds a publish event" do
-      [_, published, _, _] = events_by_statuses(@statuses)
+      %{published: published} = events_by_statuses(@statuses)
 
       {:ok, result} = Absinthe.run(@query, @schema, variables: %{"id" => published.id})
 
@@ -123,7 +124,7 @@ defmodule EventManagerWeb.Schema.EventTest do
     end
 
     test "doesn't find a cancelled event" do
-      [_, _, cancelled, _] = events_by_statuses(@statuses)
+      %{cancelled: cancelled} = events_by_statuses(@statuses)
 
       {:ok, result} = Absinthe.run(@query, @schema, variables: %{"id" => cancelled.id})
 
@@ -131,7 +132,7 @@ defmodule EventManagerWeb.Schema.EventTest do
     end
 
     test "finds an event with closed participations" do
-      [_, _, _, participations_closed] = events_by_statuses(@statuses)
+      %{participations_closed: participations_closed} = events_by_statuses(@statuses)
 
       {:ok, result} =
         Absinthe.run(@query, @schema, variables: %{"id" => participations_closed.id})
