@@ -25,8 +25,21 @@ defmodule EventManager.Events do
       [%Event{}, ...]
 
   """
-  def list_events do
-    Repo.all(Event)
+  def list_events, do: Repo.all(Event)
+
+  @doc """
+  Returns a list of only published events.
+
+  ## Examples
+
+      iex> list_published_events()
+      [%Event{}, ...]
+
+  """
+  def list_published_events do
+    Event
+    |> where_published()
+    |> Repo.all()
   end
 
   @doc """
@@ -36,9 +49,27 @@ defmodule EventManager.Events do
 
       iex> list_events(10, 1)
       [%Event{}, ...]
+
   """
   def list_events(limit, offset) do
     Event
+    |> limit(^limit)
+    |> offset(^offset)
+    |> Repo.all()
+  end
+
+  @doc """
+  Returns a list of only published events.
+
+  ## Examples
+
+      iex> list_published_events(10, 1)
+      [%Event{}, ...]
+
+  """
+  def list_published_events(limit, offset) do
+    Event
+    |> where_published()
     |> limit(^limit)
     |> offset(^offset)
     |> Repo.all()
@@ -75,6 +106,46 @@ defmodule EventManager.Events do
 
   """
   def get_event(id), do: Repo.get(Event, id)
+
+  @doc """
+  Gets a single published event.
+
+  Raises `Ecto.NoResultsError` if it doesn't exist or it isn't published.
+
+  ## Examples
+
+      iex> get_event!(123)
+      %Event{}
+
+      iex> get_event!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_published_event!(id) do
+    Event
+    |> where_published()
+    |> Repo.get!(id)
+  end
+
+  @doc """
+  Gets a single event.
+
+  Returns `nil` if it doesn't exist or it isn't published.
+
+  ## Examples
+
+      iex> get_event(123)
+      %Event{}
+
+      iex> get_event(456)
+      nil
+
+  """
+  def get_published_event(id) do
+    Event
+    |> where_published()
+    |> Repo.get(id)
+  end
 
   @doc """
   Creates a event.
@@ -153,5 +224,9 @@ defmodule EventManager.Events do
   def get_event_creator(%Event{} = event) do
     Ecto.assoc(event, :creator)
     |> Repo.one!()
+  end
+
+  defp where_published(queryable) do
+    where(queryable, [q], q.status in ["published", "participations_closed"])
   end
 end

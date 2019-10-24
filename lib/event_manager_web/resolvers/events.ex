@@ -14,13 +14,13 @@ defmodule EventManagerWeb.Resolvers.Events do
                 |> Keyword.get(:max_per_page, 50)
 
   def get_event(params, _info) do
-    do_get_event(params, &Events.get_event/1)
+    do_get_event(params, &Events.get_published_event/1)
   end
 
   def events(args, _info) do
     case Connection.offset_and_limit_for_query(args, max: @max_per_page) do
       {:ok, offset, limit} ->
-        Events.list_events(limit, offset) |> Connection.from_slice(offset)
+        Events.list_published_events(limit, offset) |> Connection.from_slice(offset)
 
       {:error,
        "You must supply a count (total number of records) option if using `last` without `before`"} ->

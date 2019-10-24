@@ -22,6 +22,7 @@ defmodule EventManagerWeb.Types.Event do
     value(:published, description: "Event is published")
     value(:ended, description: "Event has ended")
     value(:cancelled, description: "Event has been cancelled")
+    value(:participations_closed, description: "Participations submit is no longer allowed")
   end
 
   object(:event) do
