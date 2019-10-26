@@ -24,7 +24,10 @@ defmodule EventManager.Events.Event do
     field :start_time, :utc_datetime
     field :end_time, :utc_datetime
     belongs_to :creator, User, foreign_key: :creator_id
-    many_to_many :attendants, User, join_through: Attendance, join_keys: [event_id: :id, attendant_id: :id]
+
+    many_to_many :attendants, User,
+      join_through: Attendance,
+      join_keys: [event_id: :id, attendant_id: :id]
 
     timestamps()
   end

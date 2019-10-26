@@ -20,7 +20,10 @@ defmodule EventManager.Users.User do
     field :last_name, :string
     field :locale, :string, default: @default_locale
     has_many :created_events, Event, foreign_key: :creator_id
-    many_to_many :events_to_attend, Event, join_through: Attendance, join_keys: [attendant_id: :id, event_id: :id]
+
+    many_to_many :events_to_attend, Event,
+      join_through: Attendance,
+      join_keys: [attendant_id: :id, event_id: :id]
 
     timestamps()
   end
