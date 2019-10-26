@@ -15,11 +15,8 @@ defmodule EventManager.Attendances do
 
       iex> list_attendances()
       [%Attendance{}, ...]
-
   """
-  def list_attendances do
-    Repo.all(Attendance)
-  end
+  def list_attendances, do: Repo.all(Attendance)
 
   @doc """
   Gets a single attendance.
@@ -33,7 +30,6 @@ defmodule EventManager.Attendances do
 
       iex> get_attendance!(456)
       ** (Ecto.NoResultsError)
-
   """
   def get_attendance!(id), do: Repo.get!(Attendance, id)
 
@@ -47,7 +43,6 @@ defmodule EventManager.Attendances do
 
       iex> create_attendance(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
-
   """
   def create_attendance(attrs \\ %{}) do
     %Attendance{}
@@ -65,7 +60,6 @@ defmodule EventManager.Attendances do
 
       iex> update_attendance(attendance, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
-
   """
   def update_attendance(%Attendance{} = attendance, attrs) do
     attendance
@@ -83,7 +77,6 @@ defmodule EventManager.Attendances do
 
       iex> delete_attendance(attendance)
       {:error, %Ecto.Changeset{}}
-
   """
   def delete_attendance(%Attendance{} = attendance) do
     Repo.delete(attendance)
@@ -96,7 +89,6 @@ defmodule EventManager.Attendances do
 
       iex> change_attendance(attendance)
       %Ecto.Changeset{source: %Attendance{}}
-
   """
   def change_attendance(%Attendance{} = attendance) do
     Attendance.changeset(attendance, %{})

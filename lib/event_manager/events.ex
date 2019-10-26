@@ -23,7 +23,6 @@ defmodule EventManager.Events do
 
       iex> list_events()
       [%Event{}, ...]
-
   """
   def list_events, do: Repo.all(Event)
 
@@ -34,7 +33,6 @@ defmodule EventManager.Events do
 
       iex> list_published_events()
       [%Event{}, ...]
-
   """
   def list_published_events do
     Event
@@ -49,7 +47,6 @@ defmodule EventManager.Events do
 
       iex> list_events(10, 1)
       [%Event{}, ...]
-
   """
   def list_events(limit, offset) do
     Event
@@ -65,7 +62,6 @@ defmodule EventManager.Events do
 
       iex> list_published_events(10, 1)
       [%Event{}, ...]
-
   """
   def list_published_events(limit, offset) do
     Event
@@ -87,7 +83,6 @@ defmodule EventManager.Events do
 
       iex> get_event!(456)
       ** (Ecto.NoResultsError)
-
   """
   def get_event!(id), do: Repo.get!(Event, id)
 
@@ -103,7 +98,6 @@ defmodule EventManager.Events do
 
       iex> get_event(456)
       nil
-
   """
   def get_event(id), do: Repo.get(Event, id)
 
@@ -119,7 +113,6 @@ defmodule EventManager.Events do
 
       iex> get_event!(456)
       ** (Ecto.NoResultsError)
-
   """
   def get_published_event!(id) do
     Event
@@ -139,7 +132,6 @@ defmodule EventManager.Events do
 
       iex> get_event(456)
       nil
-
   """
   def get_published_event(id) do
     Event
@@ -157,7 +149,6 @@ defmodule EventManager.Events do
 
       iex> create_event(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
-
   """
   def create_event(attrs \\ %{})
 
@@ -184,7 +175,6 @@ defmodule EventManager.Events do
 
       iex> update_event(event, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
-
   """
   def update_event(%Event{} = event, attrs) do
     event
@@ -202,7 +192,6 @@ defmodule EventManager.Events do
 
       iex> delete_event(event)
       {:error, %Ecto.Changeset{}}
-
   """
   def delete_event(%Event{} = event) do
     Repo.delete(event)
@@ -215,7 +204,6 @@ defmodule EventManager.Events do
 
       iex> change_event(event)
       %Ecto.Changeset{source: %Event{}}
-
   """
   def change_event(%Event{} = event) do
     Event.changeset(event, %{})
