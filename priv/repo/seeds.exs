@@ -30,9 +30,9 @@ create_event = fn tag, creator ->
   |> Repo.insert!()
 end
 
-first_by = fn model, field ->
+first_by = fn queryable, field ->
   where = [{field, "#{field}1"}]
-  Repo.one(from resource in model, where: ^where)
+  Repo.one(from resource in queryable, where: ^where)
 end
 
 Repo.delete_all(Attendance)

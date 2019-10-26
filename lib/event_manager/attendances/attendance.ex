@@ -20,7 +20,7 @@ defmodule EventManager.Attendances.Attendance do
   @doc false
   def changeset(attendance, attrs) do
     attendance
-    |> cast(attrs, [:email, :attendant_id, :event_id])
-    |> validate_required([:email, :attendant_id, :event_id])
+    |> cast(attrs, [:email])
+    |> validate_required([:email])
   end
 end

@@ -13,5 +13,7 @@ defmodule EventManager.Repo.Migrations.CreateAttendances do
 
     create index(:attendances, [:attendant_id])
     create index(:attendances, [:event_id])
+    create unique_index(:attendances, [:attendant_id, :event_id])
+    create unique_index(:attendances, [:email, :event_id])
   end
 end
