@@ -5,6 +5,8 @@ defmodule EventManager.Users.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias EventManager.{Events, Attendances}
+
   @default_locale Application.get_env(:gettext, :default_locale)
   @primary_key {:id, :binary_id, autogenerate: false}
   @foreign_key_type :binary_id
@@ -16,7 +18,11 @@ defmodule EventManager.Users.User do
     field :first_name, :string
     field :last_name, :string
     field :locale, :string, default: @default_locale
-    has_many :created_events, EventManager.Events.Event, foreign_key: :creator_id
+    has_many :created_events, Events.Event, foreign_key: :creator_id
+
+    many_to_many :events_to_attend, Events.Event,
+      join_through: Attendances.Attendance,
+      join_keys: [attendee_id: :id, event_id: :id]
 
     timestamps()
   end
