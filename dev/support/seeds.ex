@@ -68,7 +68,7 @@ defmodule EventManager.Seeds do
       others,
       fn other ->
         %Attendances.Attendance{
-          attendant: other,
+          attendee: other,
           event: event1
         }
         |> Repo.insert!()

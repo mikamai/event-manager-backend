@@ -23,7 +23,7 @@ defmodule EventManager.Users.User do
 
     many_to_many :events_to_attend, Event,
       join_through: Attendance,
-      join_keys: [attendant_id: :id, event_id: :id]
+      join_keys: [attendee_id: :id, event_id: :id]
 
     timestamps()
   end

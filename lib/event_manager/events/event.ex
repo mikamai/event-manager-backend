@@ -25,9 +25,9 @@ defmodule EventManager.Events.Event do
     field :end_time, :utc_datetime
     belongs_to :creator, User, foreign_key: :creator_id
 
-    many_to_many :attendants, User,
+    many_to_many :attendees, User,
       join_through: Attendance,
-      join_keys: [event_id: :id, attendant_id: :id]
+      join_keys: [event_id: :id, attendee_id: :id]
 
     timestamps()
   end
@@ -40,5 +40,6 @@ defmodule EventManager.Events.Event do
     struct
     |> cast(params, [:title, :description, :location, :public, :status, :start_time, :end_time])
     |> validate_required([:title, :description, :location, :status, :start_time, :end_time])
+    |> foreign_key_constraint(:creator)
   end
 end

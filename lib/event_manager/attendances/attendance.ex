@@ -1,6 +1,6 @@
 defmodule EventManager.Attendances.Attendance do
   @moduledoc """
-    Represents an event attendance by a user account (attendant)
+    Represents an event attendance by a user account (attendee)
     or simply by an email address.
   """
   use Ecto.Schema
@@ -11,7 +11,8 @@ defmodule EventManager.Attendances.Attendance do
 
   schema "attendances" do
     field :email, :string
-    belongs_to :attendant, EventManager.Users.User, foreign_key: :attendant_id
+    # field :attendand_id (if no need for Attendance.attendee) ?
+    belongs_to :attendee, EventManager.Users.User, foreign_key: :attendee_id
     belongs_to :event, EventManager.Events.Event
 
     timestamps()
@@ -20,7 +21,7 @@ defmodule EventManager.Attendances.Attendance do
   @doc false
   def changeset(attendance, attrs) do
     attendance
-    |> cast(attrs, [:email])
-    |> validate_required([:email])
+    |> cast(attrs, [:email, :event_id])
+    |> validate_required([:event_id])
   end
 end
