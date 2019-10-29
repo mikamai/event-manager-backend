@@ -47,7 +47,8 @@ defmodule EventManager.Attendances do
   def create_attendance(attrs \\ %{})
 
   def create_attendance(%{event_id: event_id} = attrs) when not is_nil(event_id) do
-    event = EventManager.Events.get_event(event_id) # load event's creator and attendees?
+    # load event's creator and attendees?
+    event = EventManager.Events.get_event(event_id)
 
     %Attendance{}
     |> Attendance.changeset(attrs)

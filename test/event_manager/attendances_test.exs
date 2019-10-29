@@ -23,8 +23,7 @@ defmodule EventManager.AttendancesTest do
     end
 
     def attendance_fixture(attrs \\ %{}) do
-      {:ok, attendance} =
-        Attendances.create_attendance(attrs)
+      {:ok, attendance} = Attendances.create_attendance(attrs)
 
       attendance
     end
@@ -43,7 +42,10 @@ defmodule EventManager.AttendancesTest do
       assert {:error, %Ecto.Changeset{}} = Attendances.create_attendance(invalid_attrs)
     end
 
-    test "update attendance with valid data", %{valid_attrs: valid_attrs, update_attrs: update_attrs} do
+    test "update attendance with valid data", %{
+      valid_attrs: valid_attrs,
+      update_attrs: update_attrs
+    } do
       attendance = attendance_fixture(valid_attrs)
 
       assert {:ok, %Attendance{} = attendance} =
@@ -52,7 +54,10 @@ defmodule EventManager.AttendancesTest do
       assert attendance.email == "@example.io"
     end
 
-    test "update attendance with invalid data returns error", %{valid_attrs: valid_attrs, invalid_attrs: invalid_attrs} do
+    test "update attendance with invalid data returns error", %{
+      valid_attrs: valid_attrs,
+      invalid_attrs: invalid_attrs
+    } do
       attendance = attendance_fixture(valid_attrs)
 
       assert {:error, %Ecto.Changeset{}} =
