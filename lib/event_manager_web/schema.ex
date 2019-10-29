@@ -1,9 +1,11 @@
 defmodule EventManagerWeb.Schema do
   @moduledoc """
-    Public GraphQL schema
+  Public GraphQL schema.
   """
 
   use Absinthe.Schema
+
+  alias EventManager.{Events, Users}
 
   import_types(Absinthe.Type.Custom)
   import_types(EventManagerWeb.Types.CurrentUser)
@@ -25,8 +27,8 @@ defmodule EventManagerWeb.Schema do
   def context(ctx) do
     loader =
       Dataloader.new()
-      |> Dataloader.add_source(EventManager.Events, EventManager.Events.data())
-      |> Dataloader.add_source(EventManager.Users, EventManager.Users.data())
+      |> Dataloader.add_source(Events, Events.data())
+      |> Dataloader.add_source(Users, Users.data())
 
     Map.put(ctx, :loader, loader)
   end

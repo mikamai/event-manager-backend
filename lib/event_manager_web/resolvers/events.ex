@@ -4,8 +4,7 @@ defmodule EventManagerWeb.Resolvers.Events do
   """
 
   alias Absinthe.Relay.Connection
-  alias EventManager.Events
-  alias EventManager.Users
+  alias EventManager.{Events, Users}
   alias Phoenix.PubSub
 
   import EventManagerWeb.Gettext
