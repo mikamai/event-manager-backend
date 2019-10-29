@@ -5,7 +5,7 @@ defmodule EventManager.Users.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias EventManager.{Events, Attendances}
+  alias EventManager.{Attendances, Events}
 
   @default_locale Application.get_env(:gettext, :default_locale)
   @primary_key {:id, :binary_id, autogenerate: false}

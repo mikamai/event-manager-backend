@@ -7,7 +7,7 @@ defmodule EventManager.Events.Event do
   import Ecto.Changeset
   import EctoEnum
 
-  alias EventManager.{Users, Attendances}
+  alias EventManager.{Attendances, Users}
 
   defenum(StatusEnum, ~w(draft published ended cancelled participations_closed))
 
