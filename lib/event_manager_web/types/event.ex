@@ -5,6 +5,9 @@ defmodule EventManagerWeb.Types.Event do
 
   use Absinthe.Schema.Notation
   use Absinthe.Relay.Schema, :modern
+
+  alias EventManager.Events
+
   import Absinthe.Resolution.Helpers, only: [dataloader: 1]
 
   input_object :event_create_input do
@@ -35,7 +38,8 @@ defmodule EventManagerWeb.Types.Event do
     field(:start_time, non_null(:datetime))
     field(:end_time, non_null(:datetime))
 
-    field(:creator, non_null(:user), resolve: dataloader(EventManager.Events))
+    field(:creator, non_null(:user), resolve: dataloader(Events))
+    field(:attendees, non_null(list_of(:user)), resolve: dataloader(Events))
   end
 
   connection(node_type: :event)
