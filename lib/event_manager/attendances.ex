@@ -44,19 +44,7 @@ defmodule EventManager.Attendances do
       iex> create_attendance(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
   """
-  def create_attendance(attrs \\ %{})
-
-  def create_attendance(%{event_id: event_id} = attrs) when not is_nil(event_id) do
-    # load event's creator and attendees?
-    event = EventManager.Events.get_event(event_id)
-
-    %Attendance{}
-    |> Attendance.changeset(attrs)
-    |> Ecto.Changeset.put_assoc(:event, event)
-    |> Repo.insert()
-  end
-
-  def create_attendance(attrs) do
+  def create_attendance(attrs \\ %{}) do
     %Attendance{}
     |> Attendance.changeset(attrs)
     |> Repo.insert()

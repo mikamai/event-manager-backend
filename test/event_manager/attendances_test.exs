@@ -1,23 +1,21 @@
 defmodule EventManager.AttendancesTest do
   use EventManager.DataCase
 
-  alias EventManager.{Attendances, Events}
+  alias EventManager.Attendances
 
   describe "attendances" do
     alias EventManager.Attendances.Attendance
 
     setup do
-      EventManager.Seeds.run()
-
-      event_id =
-        Events.Event
-        |> EventManager.Seeds.first_by(:title)
-        |> Map.fetch!(:id)
+      creator = user_fixture()
+      event = event_fixture(%{creator: creator, status: :published, title: "Test Event"})
+      attendee = user_fixture(name: "Test Attendee")
 
       {
         :ok,
-        valid_attrs: %{email: "@example.com", event_id: event_id},
-        update_attrs: %{email: "@example.io", event_id: event_id},
+        valid_email: %{email: "@test", event_id: event.id},
+        update_email: %{email: "@new", event_id: event.id},
+        valid_user: %{attendee_id: attendee.id, event_id: event.id},
         invalid_attrs: %{event_id: nil}
       }
     end
@@ -28,50 +26,86 @@ defmodule EventManager.AttendancesTest do
       attendance
     end
 
-    test "create attendance with valid data", %{valid_attrs: valid_attrs} do
-      assert {:ok, %Attendance{} = attendance} = Attendances.create_attendance(valid_attrs)
-      assert attendance.email == "@example.com"
+    #
+    # CREATE WITH EMAIL
+    #
+
+    test "create attendance given a valid email", %{valid_email: valid_email} do
+      assert {:ok, attendance} = Attendances.create_attendance(valid_email)
+      assert attendance.email == "@test"
     end
 
-    test "new attendance loads an event", %{valid_attrs: valid_attrs} do
-      assert {:ok, %Attendance{} = attendance} = Attendances.create_attendance(valid_attrs)
-      assert attendance.event.title == "title1"
+    test "new attendance loads the event", %{valid_email: valid_email} do
+      assert {:ok, attendance} = Attendances.create_attendance(valid_email)
+
+      attendance = Repo.preload(attendance, :event)
+
+      assert attendance.event.title == "Test Event"
+    end
+
+    #
+    # CREATE WITH USER ID
+    #
+
+    test "create attendance given a valid user id", %{valid_user: valid_user} do
+      assert {:ok, attendance} = Attendances.create_attendance(valid_user)
+      assert attendance.attendee_id == valid_user.attendee_id
+    end
+
+    test "new attendance loads the user", %{valid_user: valid_user} do
+      assert {:ok, attendance} = Attendances.create_attendance(valid_user)
+
+      attendance = Repo.preload(attendance, :attendee)
+
+      assert attendance.attendee.name == "Test Attendee"
     end
 
     test "create attendance with invalid data returns error", %{invalid_attrs: invalid_attrs} do
       assert {:error, %Ecto.Changeset{}} = Attendances.create_attendance(invalid_attrs)
     end
 
+    #
+    # UPDATE
+    #
+
     test "update attendance with valid data", %{
-      valid_attrs: valid_attrs,
-      update_attrs: update_attrs
+      valid_email: valid_email,
+      update_email: update_email
     } do
-      attendance = attendance_fixture(valid_attrs)
+      attendance = attendance_fixture(valid_email)
 
-      assert {:ok, %Attendance{} = attendance} =
-               Attendances.update_attendance(attendance, update_attrs)
+      assert {:ok, attendance} =
+               Attendances.update_attendance(attendance, update_email)
 
-      assert attendance.email == "@example.io"
+      assert attendance.email == "@new"
     end
 
     test "update attendance with invalid data returns error", %{
-      valid_attrs: valid_attrs,
+      valid_email: valid_email,
       invalid_attrs: invalid_attrs
     } do
-      attendance = attendance_fixture(valid_attrs)
+      attendance = attendance_fixture(valid_email)
 
       assert {:error, %Ecto.Changeset{}} =
                Attendances.update_attendance(attendance, invalid_attrs)
     end
 
-    test "delete_attendance/1", %{valid_attrs: valid_attrs} do
-      attendance = attendance_fixture(valid_attrs)
+    #
+    # DELETE
+    #
+
+    test "delete_attendance/1", %{valid_email: valid_email} do
+      attendance = attendance_fixture(valid_email)
       assert {:ok, %Attendance{}} = Attendances.delete_attendance(attendance)
       assert_raise Ecto.NoResultsError, fn -> Attendances.get_attendance!(attendance.id) end
     end
 
-    test "change_attendance/1 returns an attendance changeset", %{valid_attrs: valid_attrs} do
-      attendance = attendance_fixture(valid_attrs)
+    #
+    # CHANGESET
+    #
+
+    test "change_attendance/1 returns an attendance changeset", %{valid_email: valid_email} do
+      attendance = attendance_fixture(valid_email)
       assert %Ecto.Changeset{} = Attendances.change_attendance(attendance)
     end
   end
