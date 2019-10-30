@@ -1,42 +1,7 @@
 defmodule EventManager.Seeds do
-  alias EventManager.{Users, Events, Attendances, Repo}
-  import Ecto.Query, only: [from: 2]
-
-  #
-  # HELPERS
-  #
-
-  def create_user(tag) do
-    %Users.User{
-      id: Ecto.UUID.generate(),
-      email: "email#{tag}",
-      name: "name#{tag}",
-      username: "username#{tag}",
-      first_name: "first_name#{tag}",
-      last_name: "last_name#{tag}"
-    }
-    |> Repo.insert!()
-  end
-
-  def create_event(tag, creator) do
-    %Events.Event{
-      creator: creator,
-      title: "title#{tag}",
-      description: "description#{tag}",
-      location: "location#{tag}",
-      status: :published,
-      start_time: DateTime.utc_now() |> DateTime.truncate(:second),
-      end_time: DateTime.utc_now() |> DateTime.truncate(:second)
-    }
-    |> Repo.insert!()
-  end
-
-  def first_by(queryable, field) do
-    where = [{field, "#{field}1"}]
-    Repo.one(from queryable, where: ^where)
-  end
-
   def run do
+    alias EventManager.{Attendances, Events, Users, Repo}
+
     #
     # CLEAN DATABASE
     #
@@ -49,30 +14,131 @@ defmodule EventManager.Seeds do
     # CREATE USERS
     #
 
-    Enum.each(1..5, &create_user(&1))
+    michael =
+      %Users.User{
+        id: craft_id(),
+        email: "michael@scott.com",
+        first_name: "Michael",
+        last_name: "Scott",
+        name: "Michael Scott",
+        username: "mscott"
+      }
+      |> Repo.insert!()
+
+    dwight =
+      %Users.User{
+        id: craft_id(),
+        email: "dwight@schrute.com",
+        first_name: "Dwight",
+        last_name: "Schrute",
+        name: "Dwight Schrute",
+        username: "dschrute"
+      }
+      |> Repo.insert!()
+
+    jim =
+      %Users.User{
+        id: craft_id(),
+        email: "jim@halpert.com",
+        first_name: "Jim",
+        last_name: "Halpert",
+        name: "Jim Halpert",
+        username: "jhalpert"
+      }
+      |> Repo.insert!()
+
+    pam =
+      %Users.User{
+        id: craft_id(),
+        email: "pam@beesly.com",
+        first_name: "Pam",
+        last_name: "Beesly",
+        name: "Pam Beesly",
+        username: "pbeesly"
+      }
+      |> Repo.insert!()
 
     #
     # CREATE EVENTS
     #
 
-    creator = first_by(Users.User, :name)
-    Enum.each(1..5, &create_event(&1, creator))
+    diversity_day =
+      %Events.Event{
+        creator: michael,
+        title: "Diversity Day",
+        description: "A consultant will join us talk about tolerance and diversity",
+        location: "The office",
+        status: :published,
+        start_time: time_now(),
+        end_time: time_now()
+      }
+      |> Repo.insert!()
+
+    _basketball_game =
+      %Events.Event{
+        creator: michael,
+        title: "Basketball Game",
+        description: "Us vs the warehouse workers",
+        location: "The warehouse",
+        status: :published,
+        start_time: time_now(),
+        end_time: time_now()
+      }
+      |> Repo.insert!()
+
+    _office_olympics =
+      %Events.Event{
+        creator: michael,
+        title: "Office Olympics",
+        description: "Came up with a bunch of office games, let's play",
+        location: "The office",
+        status: :published,
+        start_time: time_now(),
+        end_time: time_now()
+      }
+      |> Repo.insert!()
+
+    _take_your_daughter_to_work_day =
+      %Events.Event{
+        creator: michael,
+        title: "Take Your Daughter To Work Day",
+        description: "Let's show off how hard we work to our loved ones",
+        location: "Dunder Mifflin",
+        status: :published,
+        start_time: time_now(),
+        end_time: time_now()
+      }
+      |> Repo.insert!()
+
+    _dinner_party =
+      %Events.Event{
+        creator: michael,
+        title: "Dinner Party",
+        description: "Couples-only dinner party",
+        location: "Michael's home",
+        status: :published,
+        start_time: time_now(),
+        end_time: time_now()
+      }
+      |> Repo.insert!()
 
     #
     # CREATE ATTENDANCES
     #
 
-    [_creator | others] = Repo.all(Users.User)
-    event1 = first_by(Events.Event, :title)
-    Enum.each(
-      others,
-      fn other ->
+    Enum.each([dwight, jim, pam],
+      fn u ->
         %Attendances.Attendance{
-          attendee: other,
-          event: event1
+          attendee: u,
+          event: diversity_day
         }
         |> Repo.insert!()
       end
     )
+
+    :ok
   end
+
+  defp time_now, do: DateTime.utc_now() |> DateTime.truncate(:second)
+  defp craft_id, do: Ecto.UUID.generate()
 end
