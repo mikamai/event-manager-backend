@@ -126,7 +126,8 @@ defmodule EventManager.Seeds do
     # CREATE ATTENDANCES
     #
 
-    Enum.each([dwight, jim, pam],
+    Enum.each(
+      [dwight, jim, pam],
       fn u ->
         %Attendances.Attendance{
           attendee: u,

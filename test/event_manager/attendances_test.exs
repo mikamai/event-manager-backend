@@ -74,8 +74,7 @@ defmodule EventManager.AttendancesTest do
     } do
       attendance = attendance_fixture(valid_email)
 
-      assert {:ok, attendance} =
-               Attendances.update_attendance(attendance, update_email)
+      assert {:ok, attendance} = Attendances.update_attendance(attendance, update_email)
 
       assert attendance.email == "@new"
     end
