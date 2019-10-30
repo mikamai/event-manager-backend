@@ -60,9 +60,11 @@ defmodule EventManager.DataCase do
     {:ok, event} =
       attrs
       |> Enum.into(%{
+        description: attrs[:description] || "A fake event",
         title: attrs[:title] || "Fake Event",
-        description: "A fake event",
+        public: attrs[:public] || true,
         location: "Here",
+        status: attrs[:status] || :draft,
         start_time: DateTime.utc_now() |> DateTime.truncate(:second),
         end_time: DateTime.utc_now() |> DateTime.truncate(:second)
       })
