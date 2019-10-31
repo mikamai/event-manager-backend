@@ -18,9 +18,27 @@ defmodule EventManager.Attendances.Attendance do
   end
 
   @doc false
-  def changeset(attendance, attrs) do
-    attendance
-    |> cast(attrs, [:email, :event_id, :attendee_id])
-    |> validate_required([:event_id])
+  def changeset(struct, %{attendee_id: _} = attrs), do: user_changeset(struct, attrs)
+  def changeset(struct, %{email: _} = attrs), do: email_changeset(struct, attrs)
+
+  def changeset(struct, attrs) do
+    struct
+    |> cast(attrs, [:event_id])
+    |> add_error(:event_id, "provide email OR user along the event")
+  end
+
+  defp user_changeset(struct, attrs) do
+    struct
+    |> cast(attrs, [:event_id, :attendee_id])
+    |> validate_required([:event_id, :attendee_id])
+    |> foreign_key_constraint(:attendee_id)
+    |> foreign_key_constraint(:event_id)
+  end
+
+  defp email_changeset(struct, attrs) do
+    struct
+    |> cast(attrs, [:event_id, :email])
+    |> validate_required([:event_id, :email])
+    |> foreign_key_constraint(:event_id)
   end
 end

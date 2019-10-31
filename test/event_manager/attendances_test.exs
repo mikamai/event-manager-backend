@@ -13,16 +13,18 @@ defmodule EventManager.AttendancesTest do
 
       {
         :ok,
+        valid_user: %{attendee_id: attendee.id, event_id: event.id, email: "@ignore"},
         valid_email: %{email: "@test", event_id: event.id},
         update_email: %{email: "@new", event_id: event.id},
-        valid_user: %{attendee_id: attendee.id, event_id: event.id},
-        invalid_attrs: %{event_id: nil}
+        invalid_attrs: %{event_id: nil},
+        invalid_user: %{attendee_id: 1, event_id: nil},
+        unknown_user: %{attendee_id: Ecto.UUID.generate(), event_id: event.id},
+        unknown_event: %{attendee_id: attendee.id, event_id: Ecto.UUID.generate()}
       }
     end
 
     def attendance_fixture(attrs \\ %{}) do
       {:ok, attendance} = Attendances.create_attendance(attrs)
-
       attendance
     end
 
@@ -37,9 +39,7 @@ defmodule EventManager.AttendancesTest do
 
     test "new attendance loads the event", %{valid_email: valid_email} do
       assert {:ok, attendance} = Attendances.create_attendance(valid_email)
-
       attendance = Repo.preload(attendance, :event)
-
       assert attendance.event.title == "Test Event"
     end
 
@@ -49,19 +49,39 @@ defmodule EventManager.AttendancesTest do
 
     test "create attendance given a valid user id", %{valid_user: valid_user} do
       assert {:ok, attendance} = Attendances.create_attendance(valid_user)
+      assert attendance.email == nil
       assert attendance.attendee_id == valid_user.attendee_id
     end
 
     test "new attendance loads the user", %{valid_user: valid_user} do
       assert {:ok, attendance} = Attendances.create_attendance(valid_user)
-
       attendance = Repo.preload(attendance, :attendee)
-
       assert attendance.attendee.name == "Test Attendee"
     end
 
+    test "errors when create attendance with invalid user id", %{invalid_user: invalid_user} do
+      assert {:error, changeset} = Attendances.create_attendance(invalid_user)
+      assert "is invalid" in errors_on(changeset).attendee_id
+      assert "can't be blank" in errors_on(changeset).event_id
+    end
+
+    #
+    # CREATE WITH NON EXISTENT DATA
+    #
+
     test "create attendance with invalid data returns error", %{invalid_attrs: invalid_attrs} do
-      assert {:error, %Ecto.Changeset{}} = Attendances.create_attendance(invalid_attrs)
+      assert {:error, changeset} = Attendances.create_attendance(invalid_attrs)
+      assert "provide email OR user along the event" in errors_on(changeset).event_id
+    end
+
+    test "errors when create attendance with non existent event", %{unknown_event: unknown_event} do
+      assert {:error, changeset} = Attendances.create_attendance(unknown_event)
+      assert "does not exist" in errors_on(changeset).event_id
+    end
+
+    test "errors when create attendance with non existent user", %{unknown_user: unknown_user} do
+      assert {:error, changeset} = Attendances.create_attendance(unknown_user)
+      assert "does not exist" in errors_on(changeset).attendee_id
     end
 
     #
@@ -73,9 +93,7 @@ defmodule EventManager.AttendancesTest do
       update_email: update_email
     } do
       attendance = attendance_fixture(valid_email)
-
       assert {:ok, attendance} = Attendances.update_attendance(attendance, update_email)
-
       assert attendance.email == "@new"
     end
 
