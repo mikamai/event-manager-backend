@@ -1,13 +1,16 @@
 defmodule EventManager.Events.Event do
   @moduledoc """
-    An event organized by a community
+  An event organized by a community.
   """
 
   use Ecto.Schema
   import Ecto.Changeset
   import EctoEnum
 
-  defenum(StatusEnum, ["draft", "published", "ended", "cancelled", "participations_closed"])
+  alias EventManager.Attendances.Attendance
+  alias EventManager.Users.User
+
+  defenum(StatusEnum, ~w(draft published ended cancelled participations_closed))
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -20,7 +23,11 @@ defmodule EventManager.Events.Event do
     field :status, StatusEnum, default: "draft"
     field :start_time, :utc_datetime
     field :end_time, :utc_datetime
-    belongs_to :creator, EventManager.Users.User, foreign_key: :creator_id
+    belongs_to :creator, User, foreign_key: :creator_id
+
+    many_to_many :attendees, User,
+      join_through: Attendance,
+      join_keys: [event_id: :id, attendee_id: :id]
 
     timestamps()
   end
@@ -33,5 +40,6 @@ defmodule EventManager.Events.Event do
     struct
     |> cast(params, [:title, :description, :location, :public, :status, :start_time, :end_time])
     |> validate_required([:title, :description, :location, :status, :start_time, :end_time])
+    |> foreign_key_constraint(:creator)
   end
 end

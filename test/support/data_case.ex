@@ -37,23 +37,40 @@ defmodule EventManager.DataCase do
     :ok
   end
 
-  alias EventManager.Users
+  alias EventManager.{Events, Users}
 
   def user_fixture(attrs \\ %{}) do
     {:ok, user} =
       attrs
       |> Enum.into(%{
-        id: Ecto.UUID.generate(),
+        name: attrs[:name] || "Fake User",
         email: "user@example.com",
-        name: "Fake User",
-        username: "user",
         first_name: "Fake",
         last_name: "User",
-        locale: "en"
+        locale: "en",
+        username: "user",
+        id: Ecto.UUID.generate()
       })
       |> Users.create_user()
 
     user
+  end
+
+  def event_fixture(attrs \\ %{}) do
+    {:ok, event} =
+      attrs
+      |> Enum.into(%{
+        description: attrs[:description] || "A fake event",
+        title: attrs[:title] || "Fake Event",
+        public: attrs[:public] || true,
+        location: "Here",
+        status: attrs[:status] || :draft,
+        start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+        end_time: DateTime.utc_now() |> DateTime.truncate(:second)
+      })
+      |> Events.create_event()
+
+    event
   end
 
   @doc """

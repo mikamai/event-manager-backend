@@ -1,9 +1,12 @@
 defmodule EventManager.Users.User do
   @moduledoc """
-    A user from the OpenID Connect provider
+  A user from the OpenID Connect provider.
   """
   use Ecto.Schema
   import Ecto.Changeset
+
+  alias EventManager.Attendances.Attendance
+  alias EventManager.Events.Event
 
   @default_locale Application.get_env(:gettext, :default_locale)
   @primary_key {:id, :binary_id, autogenerate: false}
@@ -16,7 +19,11 @@ defmodule EventManager.Users.User do
     field :first_name, :string
     field :last_name, :string
     field :locale, :string, default: @default_locale
-    has_many :created_events, EventManager.Events.Event, foreign_key: :creator_id
+    has_many :created_events, Event, foreign_key: :creator_id
+
+    many_to_many :events_to_attend, Event,
+      join_through: Attendance,
+      join_keys: [attendee_id: :id, event_id: :id]
 
     timestamps()
   end

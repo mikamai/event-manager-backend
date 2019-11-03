@@ -8,41 +8,27 @@ defmodule EventManager.EventsTest do
 
     @valid_attrs %{
       description: "Test",
-      title: "test",
-      location: "here",
-      public: true,
+      title: "Test",
+      location: "Here",
       status: :draft,
-      start_time:
-        DateTime.utc_now()
-        |> DateTime.truncate(:second)
-        |> DateTime.to_iso8601(),
-      end_time:
-        DateTime.utc_now()
-        |> DateTime.truncate(:second)
-        |> DateTime.to_iso8601()
+      start_time: DateTime.utc_now() |> DateTime.truncate(:second),
+      end_time: DateTime.utc_now() |> DateTime.truncate(:second)
     }
 
-    @update_attrs %{
-      description: "Different description"
-    }
+    @update_attrs %{description: "New description"}
 
     @invalid_attrs %{
       description: "Test",
-      title: "test",
-      location: "here",
-      public: "test",
+      title: "Test",
+      location: "Here",
+      public: "true",
       start_time: "false",
       end_time: 1
     }
 
-    def event_fixture(attrs \\ %{}) do
-      {:ok, event} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Events.create_event()
-
-      event
-    end
+    #
+    # READ
+    #
 
     test "list_events/0 returns all events" do
       event = event_fixture()
@@ -59,17 +45,27 @@ defmodule EventManager.EventsTest do
       assert Events.get_event(event.id) == event
     end
 
+    #
+    # CREATE
+    #
+
     test "create_event/1 with valid data creates a event" do
-      assert {:ok, %Event{} = event} = Events.create_event(@valid_attrs)
+      assert {:ok, event} = Events.create_event(@valid_attrs)
+      assert event.description == "Test"
     end
 
     test "create_event/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Events.create_event(@invalid_attrs)
     end
 
+    #
+    # UPDATE
+    #
+
     test "update_event/2 with valid data updates the event" do
-      event = event_fixture()
-      assert {:ok, %Event{} = event} = Events.update_event(event, @update_attrs)
+      event = event_fixture(%{description: "Old description"})
+      assert {:ok, event} = Events.update_event(event, @update_attrs)
+      assert event.description == "New description"
     end
 
     test "update_event/2 with invalid data returns error changeset" do
@@ -78,11 +74,19 @@ defmodule EventManager.EventsTest do
       assert event == Events.get_event!(event.id)
     end
 
+    #
+    # DELETE
+    #
+
     test "delete_event/1 deletes the event" do
       event = event_fixture()
       assert {:ok, %Event{}} = Events.delete_event(event)
       assert_raise Ecto.NoResultsError, fn -> Events.get_event!(event.id) end
     end
+
+    #
+    # CHANGESET
+    #
 
     test "change_event/1 returns a event changeset" do
       event = event_fixture()
