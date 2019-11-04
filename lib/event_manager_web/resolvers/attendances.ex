@@ -13,7 +13,6 @@ defmodule EventManagerWeb.Resolvers.Attendances do
     case Map.put(args, :attendee_id, user.id)
          |> Attendances.create_attendance() do
       {:ok, attendance} ->
-        # (attendance, [:attendee, :event])
         attendance = EventManager.Repo.preload(attendance, :event)
         {:ok, attendance.event}
 
