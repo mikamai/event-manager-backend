@@ -9,15 +9,16 @@ defmodule EventManagerWeb.Resolvers.Attendances do
 
   # import EventManagerWeb.Gettext
 
-  def create_attendance(args, %{context: %{current_user: current_user}}) do
-    case Map.put(args, :attendee, current_user)
+  def create_attendance(args, %{context: %{current_user: user}}) do
+    case Map.put(args, :attendee_id, user.id)
          |> Attendances.create_attendance() do
       {:ok, attendance} ->
-        # attendance = Repo.preload(attendance, [:attendee, :event])
+        # (attendance, [:attendee, :event])
+        attendance = EventManager.Repo.preload(attendance, :event)
         {:ok, attendance.event}
 
       {:error, changeset} ->
-       {:error, changeset.errors}
+        {:error, changeset.errors}
     end
   end
 
