@@ -7,6 +7,7 @@ defmodule EventManagerWeb.Schema.Events do
   use Absinthe.Schema.Notation
   use Absinthe.Relay.Schema, :modern
 
+  alias EventManagerWeb.Resolvers.Attendances
   alias EventManagerWeb.Resolvers.Events
   Absinthe.Relay.Connection.Notation
   import_types(EventManagerWeb.Types.Event)
@@ -50,6 +51,14 @@ defmodule EventManagerWeb.Schema.Events do
       arg(:id, non_null(:id))
 
       resolve(&Events.cancel_event/2)
+    end
+
+    @desc "Attend an event"
+    field :event_attend, :event do
+      arg(:event_id, non_null(:id))
+      arg(:email, :string)
+
+      resolve(&Attendances.create_attendance/2)
     end
   end
 end

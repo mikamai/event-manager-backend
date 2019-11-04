@@ -566,4 +566,71 @@ defmodule EventManagerWeb.Schema.EventTest do
       assert error == message
     end
   end
+
+  describe "mutation eventAttend" do
+    test "accepts an email" do
+      mutation = """
+      mutation($eventId: ID!, $email: String) {
+        eventAttend(eventId: $eventId, email: $email) { #{@event_data} }
+      }
+      """
+
+      event = event_fixture(status: :published)
+      variables = %{"eventId" => event.id, "email" => "@"}
+
+      {:ok, result} = Absinthe.run(mutation, @schema, variables: variables)
+
+      assert %{
+               data: %{
+                 "eventAttend" => %{
+                   "description" => description,
+                   "endTime" => end_time,
+                   "location" => location,
+                   "startTime" => start_time,
+                   "status" => "PUBLISHED",
+                   "title" => title
+                 }
+               }
+             } = result
+
+      assert description == event.description
+      assert end_time == event.end_time |> DateTime.to_iso8601()
+      assert location == event.location
+      assert start_time == event.start_time |> DateTime.to_iso8601()
+      assert title == event.title
+    end
+
+    test "accepts a user" do
+      mutation = """
+      mutation($eventId: ID!) {
+        eventAttend(eventId: $eventId) { #{@event_data} }
+      }
+      """
+
+      context = current_user()
+      event = event_fixture(status: :published)
+      variables = %{"eventId" => event.id}
+
+      {:ok, result} = Absinthe.run(mutation, @schema, variables: variables, context: context)
+
+      assert %{
+               data: %{
+                 "eventAttend" => %{
+                   "description" => description,
+                   "endTime" => end_time,
+                   "location" => location,
+                   "startTime" => start_time,
+                   "status" => "PUBLISHED",
+                   "title" => title
+                 }
+               }
+             } = result
+
+      assert description == event.description
+      assert end_time == event.end_time |> DateTime.to_iso8601()
+      assert location == event.location
+      assert start_time == event.start_time |> DateTime.to_iso8601()
+      assert title == event.title
+    end
+  end
 end
